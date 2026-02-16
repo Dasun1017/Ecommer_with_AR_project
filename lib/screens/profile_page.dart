@@ -3,6 +3,12 @@ import '../services/auth_service.dart';
 import '../services/order_service.dart';
 import '../models/user_model.dart';
 import '../models/order_model.dart' as models;
+import 'edit_profile_page.dart';
+import 'orders_page.dart';
+import 'order_details_page.dart';
+import 'wishlist_page.dart';
+import 'settings_page.dart';
+import 'help_support_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -71,7 +77,17 @@ class _ProfilePageState extends State<ProfilePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () => _editProfile(),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditProfilePage(user: _user!),
+                ),
+              );
+              if (result == true) {
+                _loadUserData();
+              }
+            },
           ),
         ],
       ),
@@ -140,49 +156,91 @@ class _ProfilePageState extends State<ProfilePage> {
         _buildOptionTile(
           icon: Icons.person_outline,
           title: 'Edit Profile',
-          onTap: () => _editProfile(),
+          onTap: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditProfilePage(user: _user!),
+              ),
+            );
+            if (result == true) {
+              _loadUserData(); // Reload user data after edit
+            }
+          },
         ),
         _buildOptionTile(
           icon: Icons.location_on_outlined,
           title: 'Addresses',
           subtitle: _user!.address,
-          onTap: () {
-            // Navigate to addresses page
+          onTap: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditProfilePage(user: _user!),
+              ),
+            );
+            if (result == true) {
+              _loadUserData();
+            }
           },
         ),
         _buildOptionTile(
           icon: Icons.payment,
           title: 'Payment Methods',
           onTap: () {
-            // Navigate to payment methods page
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Payment methods feature coming soon!'),
+              ),
+            );
           },
         ),
         _buildOptionTile(
           icon: Icons.shopping_bag_outlined,
           title: 'My Orders',
           onTap: () {
-            // Navigate to orders page
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const OrdersPage(),
+              ),
+            );
           },
         ),
         _buildOptionTile(
           icon: Icons.favorite_outline,
           title: 'Wishlist',
           onTap: () {
-            // Navigate to wishlist page
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const WishlistPage(),
+              ),
+            );
           },
         ),
         _buildOptionTile(
           icon: Icons.settings_outlined,
           title: 'Settings',
           onTap: () {
-            // Navigate to settings page
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SettingsPage(),
+              ),
+            );
           },
         ),
         _buildOptionTile(
           icon: Icons.help_outline,
           title: 'Help & Support',
           onTap: () {
-            // Navigate to help page
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HelpSupportPage(),
+              ),
+            );
           },
         ),
         const Divider(),
@@ -233,7 +291,12 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               TextButton(
                 onPressed: () {
-                  // Navigate to all orders
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OrdersPage(),
+                    ),
+                  );
                 },
                 child: const Text('View All'),
               ),
@@ -275,7 +338,12 @@ class _ProfilePageState extends State<ProfilePage> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: InkWell(
         onTap: () {
-          // Navigate to order details
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrderDetailsPage(order: order),
+            ),
+          );
         },
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -302,7 +370,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(height: 4),
               Text(
-                '\$${order.totalAmount.toStringAsFixed(2)}',
+                'Rs. ${order.totalAmount.toStringAsFixed(2)}',
                 style: TextStyle(
                   color: Theme.of(context).primaryColor,
                   fontWeight: FontWeight.bold,
@@ -340,7 +408,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -354,22 +422,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _editProfile() {
-    // Show edit profile dialog or navigate to edit profile page
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Profile'),
-        content: const Text('Edit profile feature coming soon!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   void _logout() async {
     final confirm = await showDialog<bool>(

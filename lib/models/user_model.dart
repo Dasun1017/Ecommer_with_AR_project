@@ -2,6 +2,7 @@ class UserModel {
   final String id;
   final String email;
   final String name;
+  final String role; // 'admin' or 'client'
   final String? phoneNumber;
   final String? photoUrl;
   final String? address;
@@ -12,6 +13,7 @@ class UserModel {
     required this.id,
     required this.email,
     required this.name,
+    this.role = 'client', // Default to client
     this.phoneNumber,
     this.photoUrl,
     this.address,
@@ -24,6 +26,7 @@ class UserModel {
       id: json['id'] as String,
       email: json['email'] as String,
       name: json['name'] as String,
+      role: json['role'] as String? ?? 'client',
       phoneNumber: json['phoneNumber'] as String?,
       photoUrl: json['photoUrl'] as String?,
       address: json['address'] as String?,
@@ -37,6 +40,7 @@ class UserModel {
       'id': id,
       'email': email,
       'name': name,
+      'role': role,
       'phoneNumber': phoneNumber,
       'photoUrl': photoUrl,
       'address': address,
@@ -49,6 +53,7 @@ class UserModel {
     String? id,
     String? email,
     String? name,
+    String? role,
     String? phoneNumber,
     String? photoUrl,
     String? address,
@@ -59,6 +64,7 @@ class UserModel {
       id: id ?? this.id,
       email: email ?? this.email,
       name: name ?? this.name,
+      role: role ?? this.role,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       photoUrl: photoUrl ?? this.photoUrl,
       address: address ?? this.address,

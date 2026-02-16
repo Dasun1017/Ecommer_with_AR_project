@@ -187,7 +187,6 @@ class _NotificationPageState extends State<NotificationPage> {
       case NotificationType.product:
         return Icons.inventory;
       case NotificationType.system:
-      default:
         return Icons.info;
     }
   }
@@ -201,7 +200,6 @@ class _NotificationPageState extends State<NotificationPage> {
       case NotificationType.product:
         return Colors.blue;
       case NotificationType.system:
-      default:
         return Colors.grey;
     }
   }

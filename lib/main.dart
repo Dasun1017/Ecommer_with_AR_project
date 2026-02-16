@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'auth_wrapper.dart';
 import 'utils/app_routes.dart';
 import 'utils/app_theme.dart';
 import 'services/notification_service.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      initialRoute: AppRoutes.getStarted,
+      home: const AuthWrapper(),
       onGenerateRoute: AppRoutes.generateRoute,
     );
   }

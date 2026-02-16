@@ -8,7 +8,6 @@ class ProductService {
   Stream<List<Product>> getAllProducts() {
     return _firestore
         .collection('products')
-        .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs
             .map((doc) => Product.fromJson({...doc.data(), 'id': doc.id}))
