@@ -1,10 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user_model.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email'],
+    serverClientId: '625706233224-5nl81cm8kihokt80c7f3st1euu25c4lk.apps.googleusercontent.com',
+  );
 
   // Get current user
   User? get currentUser => _auth.currentUser;
@@ -17,6 +22,7 @@ class AuthService {
     required String email,
     required String password,
     required String name,
+    String role = 'client', // Default to client role
   }) async {
     try {
       final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
@@ -29,6 +35,7 @@ class AuthService {
           id: userCredential.user!.uid,
           email: email,
           name: name,
+          role: role,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
@@ -90,6 +97,71 @@ class AuthService {
     return null;
   }
 
+  // Sign in with Google
+  Future<UserModel?> signInWithGoogle() async {
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      
+      if (googleUser == null) {
+        // User canceled the sign-in
+        return null;
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase with the Google credential
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+
+      if (userCredential.user != null) {
+        // Check if user exists in Firestore
+        final userDoc = await _firestore.collection('users').doc(userCredential.user!.uid).get();
+        
+        if (!userDoc.exists) {
+          // Create new user document if it doesn't exist
+          final user = UserModel(
+            id: userCredential.user!.uid,
+            email: userCredential.user!.email ?? '',
+            name: userCredential.user!.displayName ?? 'User',
+            role: 'client', // Default to client role
+            photoUrl: userCredential.user!.photoURL,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          );
+          
+          await _firestore.collection('users').doc(user.id).set(user.toJson());
+          return user;
+        } else {
+          // Return existing user data
+          return await getUserData(userCredential.user!.uid);
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'account-exists-with-different-credential':
+          throw Exception('An account already exists with the same email but different sign-in credentials.');
+        case 'invalid-credential':
+          throw Exception('The credential is malformed or has expired.');
+        case 'operation-not-allowed':
+          throw Exception('Google sign-in is not enabled.');
+        case 'user-disabled':
+          throw Exception('This account has been disabled.');
+        default:
+          throw Exception('Google sign-in failed: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Google sign-in failed: $e');
+    }
+    return null;
+  }
+
   // Get user data from Firestore
   Future<UserModel?> getUserData(String uid) async {
     try {
@@ -115,7 +187,10 @@ class AuthService {
   // Sign out
   Future<void> signOut() async {
     try {
-      await _auth.signOut();
+      await Future.wait([
+        _auth.signOut(),
+        _googleSignIn.signOut(),
+      ]);
     } catch (e) {
       throw Exception('Sign out failed: $e');
     }

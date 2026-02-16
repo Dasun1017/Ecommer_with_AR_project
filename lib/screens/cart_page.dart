@@ -166,7 +166,7 @@ class _CartPageState extends State<CartPage> {
                   Row(
                     children: [
                       Text(
-                        '\$${item.price.toStringAsFixed(2)}',
+                        'Rs. ${item.price.toStringAsFixed(2)}',
                         style: TextStyle(
                           color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.bold,
@@ -310,7 +310,7 @@ class _CartPageState extends State<CartPage> {
             ),
           ),
           Text(
-            '\$${amount.toStringAsFixed(2)}',
+            'Rs. ${amount.toStringAsFixed(2)}',
             style: TextStyle(
               fontSize: isTotal ? 18 : 16,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,

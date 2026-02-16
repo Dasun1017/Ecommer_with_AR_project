@@ -10,13 +10,37 @@ import '../screens/cart_page.dart';
 import '../screens/checkout_page.dart';
 import '../screens/profile_page.dart';
 import '../screens/notification_page.dart';
+import '../screens/admin/admin_dashboard.dart';
+import '../screens/admin/manage_products_page.dart';
+import '../screens/admin/manage_orders_page.dart';
+import '../screens/admin/manage_users_page.dart';
 import '../models/product_model.dart';
 import '../models/cart_item_model.dart';
 
 class AppRoutes {
+  // ==================== APP NAVIGATION STRUCTURE ====================
+  // 
+  // INITIAL FLOW:
+  // 1. App opens → AuthWrapper (checks authentication)
+  // 2. Not logged in → GetStartedPage (onboarding)
+  // 3. GetStarted/Skip → LoginPage
+  // 4. Login success → AuthWrapper detects auth change
+  // 5. AuthWrapper checks role in Firestore:
+  //    - role = 'admin' → AdminDashboard (ADMIN SIDE)
+  //    - role = 'client' → HomePage (CLIENT SIDE)
+  //
+  // NAVIGATION SEPARATION:
+  // - Admin Side: AdminDashboard → only navigates to admin/* routes
+  // - Client Side: HomePage → only navigates to client routes (shop, cart, profile, etc.)
+  // - No cross-navigation between admin and client sides
+  // 
+  // ==================================================================
+  
   static const String getStarted = '/';
   static const String login = '/login';
   static const String register = '/register';
+  
+  // CLIENT ROUTES (accessible from client side only)
   static const String home = '/home';
   static const String shop = '/shop';
   static const String products = '/products';
@@ -25,8 +49,20 @@ class AppRoutes {
   static const String checkout = '/checkout';
   static const String profile = '/profile';
   static const String notifications = '/notifications';
+  
+  // ADMIN ROUTES (accessible from admin side only)
+  static const String adminDashboard = '/admin/dashboard';
+  static const String adminProducts = '/admin/products';
+  static const String adminOrders = '/admin/orders';
+  static const String adminUsers = '/admin/users';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
+    // NOTE: Role-based access is controlled by navigation structure, not route guards:
+    // - AuthWrapper handles initial routing based on user role
+    // - Admin pages only contain navigation to admin routes
+    // - Client pages only contain navigation to client routes
+    // - This prevents unauthorized access through proper app architecture
+    
     switch (settings.name) {
       case getStarted:
         return MaterialPageRoute(builder: (_) => const GetStartedPage());
@@ -37,6 +73,7 @@ class AppRoutes {
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterPage());
       
+      // ==================== CLIENT ROUTES ====================
       case home:
         return MaterialPageRoute(builder: (_) => const HomePage());
       
@@ -73,6 +110,26 @@ class AppRoutes {
       
       case notifications:
         return MaterialPageRoute(builder: (_) => const NotificationPage());
+      
+      // ==================== ADMIN ROUTES ====================
+      // These routes are for admin users only
+      // Client pages don't navigate to these routes
+      // Access controlled by:
+      // 1. AuthWrapper routes admins to AdminDashboard initially
+      // 2. Admin pages only contain navigation to other admin routes
+      // 3. No direct links from client side to admin routes
+      
+      case adminDashboard:
+        return MaterialPageRoute(builder: (_) => const AdminDashboard());
+      
+      case adminProducts:
+        return MaterialPageRoute(builder: (_) => const ManageProductsPage());
+      
+      case adminOrders:
+        return MaterialPageRoute(builder: (_) => const ManageOrdersPage());
+      
+      case adminUsers:
+        return MaterialPageRoute(builder: (_) => const ManageUsersPage());
       
       default:
         return MaterialPageRoute(

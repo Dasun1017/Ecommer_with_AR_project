@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/product_service.dart';
+import '../services/wishlist_service.dart';
+import '../services/auth_service.dart';
 import '../models/product_model.dart';
 
 class ShopPage extends StatefulWidget {
@@ -11,10 +13,64 @@ class ShopPage extends StatefulWidget {
 
 class _ShopPageState extends State<ShopPage> {
   final ProductService _productService = ProductService();
+  final WishlistService _wishlistService = WishlistService();
+  final AuthService _authService = AuthService();
   String? _selectedCategory;
   String _sortBy = 'newest';
   int _selectedIndex = 1;
-  bool _isCategorySidebarExpanded = true;
+  bool _isCategorySidebarExpanded = false;
+  List<String> _wishlistIds = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWishlist();
+  }
+
+  void _loadWishlist() {
+    final userId = _authService.currentUser?.uid;
+    if (userId != null) {
+      _wishlistService.getWishlist(userId).listen((wishlist) {
+        if (mounted) {
+          setState(() {
+            _wishlistIds = wishlist;
+          });
+        }
+      });
+    }
+  }
+
+  Future<void> _toggleWishlist(String productId, String productName) async {
+    final userId = _authService.currentUser?.uid;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login to add to wishlist')),
+      );
+      return;
+    }
+
+    final isInWishlist = _wishlistIds.contains(productId);
+    try {
+      await _wishlistService.toggleWishlist(userId, productId, isInWishlist);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isInWishlist
+                  ? 'Removed from wishlist'
+                  : '$productName added to wishlist',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -313,21 +369,113 @@ class _ShopPageState extends State<ShopPage> {
     switch (category.toLowerCase()) {
       case 'all':
         return Icons.grid_view;
+      
+      // Clothing Categories
+      case 'shirts':
+        return Icons.checkroom;
+      case 'hoodies':
+      case 'hoodie':
+        return Icons.checkroom_outlined;
+      case 't-shirts':
+      case 'tshirts':
+      case 't-shirt':
+        return Icons.checkroom;
+      case 'pants':
+      case 'jeans':
+      case 'trousers':
+        return Icons.accessibility_new;
+      case 'dresses':
+      case 'dress':
+        return Icons.woman;
+      case 'jackets':
+      case 'jacket':
+      case 'coats':
+        return Icons.style;
+      case 'activewear':
+      case 'sportswear':
+        return Icons.sports;
+      
+      // Footwear
+      case 'shoes':
+      case 'sneakers':
+      case 'footwear':
+        return Icons.backpack;
+      case 'sandals':
+        return Icons.beach_access;
+      
+      // Accessories
+      case 'accessories':
+        return Icons.watch;
+      case 'watches':
+      case 'watch':
+        return Icons.watch;
+      case 'bags':
+      case 'handbags':
+      case 'backpacks':
+        return Icons.backpack;
+      case 'jewelry':
+      case 'jewellery':
+        return Icons.diamond;
+      case 'sunglasses':
+      case 'glasses':
+        return Icons.visibility;
+      case 'hats':
+      case 'caps':
+        return Icons.checkroom;
+      
+      // Gender/Age Categories
+      case 'men':
+      case 'mens':
+        return Icons.man;
+      case 'women':
+      case 'womens':
+        return Icons.woman;
+      case 'kids':
+      case 'children':
+        return Icons.child_care;
+      case 'baby':
+        return Icons.child_friendly;
+      
+      // General Categories
       case 'electronics':
+      case 'gadgets':
         return Icons.devices;
       case 'fashion':
       case 'clothing':
         return Icons.checkroom;
       case 'home':
+      case 'home & living':
         return Icons.home;
+      case 'furniture':
+        return Icons.weekend;
       case 'beauty':
+      case 'cosmetics':
         return Icons.face;
       case 'sports':
+      case 'fitness':
         return Icons.sports_basketball;
       case 'books':
         return Icons.book;
       case 'toys':
+      case 'games':
         return Icons.toys;
+      case 'grocery':
+      case 'food':
+        return Icons.shopping_basket;
+      case 'pets':
+        return Icons.pets;
+      
+      // Special Categories
+      case 'sale':
+      case 'offers':
+        return Icons.local_offer;
+      case 'new':
+      case 'new arrivals':
+        return Icons.fiber_new;
+      case 'trending':
+      case 'popular':
+        return Icons.trending_up;
+      
       default:
         return Icons.category;
     }
@@ -362,9 +510,9 @@ class _ShopPageState extends State<ShopPage> {
           padding: const EdgeInsets.all(16),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            childAspectRatio: 0.7,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
+            childAspectRatio: 0.62,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
           ),
           itemCount: products.length,
           itemBuilder: (context, index) {
@@ -394,6 +542,8 @@ class _ShopPageState extends State<ShopPage> {
   }
 
   Widget _buildProductCard(Product product) {
+    final isInWishlist = _wishlistIds.contains(product.id);
+    
     return InkWell(
       onTap: () => Navigator.pushNamed(
         context,
@@ -420,16 +570,65 @@ class _ShopPageState extends State<ShopPage> {
                         ? Image.network(
                             product.images.first,
                             fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              );
+                            },
                             errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons.image, size: 50);
+                              print('Image load error for ${product.name}: $error');
+                              print('Image URL: ${product.images.isNotEmpty ? product.images.first : "No URL"}');
+                              return const Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                                    SizedBox(height: 4),
+                                    Text('Image not available', style: TextStyle(fontSize: 9), textAlign: TextAlign.center),
+                                    Text('(Check console)', style: TextStyle(fontSize: 8, color: Colors.grey)),
+                                  ],
+                                ),
+                              );
                             },
                           )
                         : const Icon(Icons.image, size: 50),
                   ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: () => _toggleWishlist(product.id, product.name),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          isInWishlist ? Icons.favorite : Icons.favorite_border,
+                          color: isInWishlist ? Colors.red : Colors.grey[600],
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ),
                   if (product.arModelUrl != null)
                     Positioned(
                       top: 8,
-                      right: 8,
+                      left: 8,
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
@@ -447,36 +646,37 @@ class _ShopPageState extends State<ShopPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(6.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     product.name,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                      fontSize: 13,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Row(
                     children: [
-                      const Icon(Icons.star, size: 14, color: Colors.amber),
+                      const Icon(Icons.star, size: 12, color: Colors.amber),
                       Text(
                         ' ${product.rating.toStringAsFixed(1)}',
-                        style: const TextStyle(fontSize: 12),
+                        style: const TextStyle(fontSize: 11),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
-                    '\$${product.price.toStringAsFixed(2)}',
+                    'Rs. ${product.price.toStringAsFixed(2)}',
                     style: TextStyle(
                       color: Theme.of(context).primaryColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
                 ],

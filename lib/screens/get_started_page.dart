@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GetStartedPage extends StatefulWidget {
   const GetStartedPage({super.key});
@@ -10,6 +11,16 @@ class GetStartedPage extends StatefulWidget {
 class _GetStartedPageState extends State<GetStartedPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+
+  /// Mark onboarding as completed and navigate to login
+  Future<void> _completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasSeenOnboarding', true);
+    
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
 
   final List<OnboardingItem> _items = [
     OnboardingItem(
@@ -51,9 +62,7 @@ class _GetStartedPageState extends State<GetStartedPage> {
                   ),
                   if (_currentPage < _items.length - 1)
                     TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/home');
-                      },
+                      onPressed: _completeOnboarding,
                       child: const Text(
                         'Skip',
                         style: TextStyle(
@@ -197,7 +206,7 @@ class _GetStartedPageState extends State<GetStartedPage> {
                   curve: Curves.easeInOut,
                 );
               } else {
-                Navigator.pushReplacementNamed(context, '/home');
+                _completeOnboarding();
               }
             },
             child: Text(

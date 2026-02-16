@@ -91,7 +91,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                   ),
                   Text(
-                    '\$${item.totalPrice.toStringAsFixed(2)}',
+                    'Rs. ${item.totalPrice.toStringAsFixed(2)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -109,7 +109,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                 ),
                 Text(
-                  '\$${widget.total.toStringAsFixed(2)}',
+                  'Rs. ${widget.total.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -313,7 +313,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                 )
               : Text(
-                  'Place Order - \$${widget.total.toStringAsFixed(2)}',
+                  'Place Order - Rs. ${widget.total.toStringAsFixed(2)}',
                   style: const TextStyle(fontSize: 16),
                 ),
         ),
