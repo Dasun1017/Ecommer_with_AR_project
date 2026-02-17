@@ -4,9 +4,13 @@ class Product {
   final String description;
   final double price;
   final String category;
+  final String? brand;
+  final String? material;
+  final List<String> tags;
   final List<String> images;
   final String? arModelUrl;
   final int stock;
+  final int soldAmount;
   final double rating;
   final int reviewCount;
   final List<String> colors;
@@ -20,9 +24,13 @@ class Product {
     required this.description,
     required this.price,
     required this.category,
+    this.brand,
+    this.material,
+    this.tags = const [],
     required this.images,
     this.arModelUrl,
     required this.stock,
+    this.soldAmount = 0,
     this.rating = 0.0,
     this.reviewCount = 0,
     this.colors = const [],
@@ -89,19 +97,29 @@ class Product {
       sizesList = List<String>.from(json['size'] as List);
     }
     
+    // Handle tags
+    List<String> tagsList = [];
+    if (json['tags'] != null && json['tags'] is List) {
+      tagsList = List<String>.from(json['tags'] as List);
+    }
+    
     return Product(
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String,
       price: (json['price'] as num).toDouble(),
       category: json['category'] as String,
+      brand: json['brand'] as String?,
+      material: json['material'] as String?,
+      tags: tagsList,
       images: imagesList,
       arModelUrl: json['arModelUrl'] as String?,
       stock: (json['stock'] ?? json['stock_amount'] ?? 0) as int,
+      soldAmount: json['sold_amount'] as int? ?? json['soldAmount'] as int? ?? 0,
       rating: (json['rating'] ?? json['reviews'] ?? 0.0) is num 
           ? ((json['rating'] ?? json['reviews']) as num).toDouble() 
           : 0.0,
-      reviewCount: json['reviewCount'] as int? ?? json['sold_amount'] as int? ?? 0,
+      reviewCount: json['reviewCount'] as int? ?? 0,
       colors: colorsList,
       sizes: sizesList,
       isFeatured: json['isFeatured'] as bool? ?? false,
@@ -118,12 +136,22 @@ class Product {
       'description': description,
       'price': price,
       'category': category,
+      'brand': brand,
+      'material': material,
+      'tags': tags,
       'images': images,
+      'image_2d': images.isNotEmpty ? images : null,
+      'image_3d': images.isNotEmpty ? images : null,
       'arModelUrl': arModelUrl,
       'stock': stock,
+      'stock_amount': stock,
+      'sold_amount': soldAmount,
       'rating': rating,
+      'reviews': rating,
       'reviewCount': reviewCount,
+      'color': colors,
       'colors': colors,
+      'size': sizes,
       'sizes': sizes,
       'isFeatured': isFeatured,
       'createdAt': createdAt.toIso8601String(),
@@ -136,9 +164,13 @@ class Product {
     String? description,
     double? price,
     String? category,
+    String? brand,
+    String? material,
+    List<String>? tags,
     List<String>? images,
     String? arModelUrl,
     int? stock,
+    int? soldAmount,
     double? rating,
     int? reviewCount,
     List<String>? colors,
@@ -152,9 +184,13 @@ class Product {
       description: description ?? this.description,
       price: price ?? this.price,
       category: category ?? this.category,
+      brand: brand ?? this.brand,
+      material: material ?? this.material,
+      tags: tags ?? this.tags,
       images: images ?? this.images,
       arModelUrl: arModelUrl ?? this.arModelUrl,
       stock: stock ?? this.stock,
+      soldAmount: soldAmount ?? this.soldAmount,
       rating: rating ?? this.rating,
       reviewCount: reviewCount ?? this.reviewCount,
       colors: colors ?? this.colors,

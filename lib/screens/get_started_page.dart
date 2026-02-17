@@ -12,13 +12,26 @@ class _GetStartedPageState extends State<GetStartedPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  /// Mark onboarding as completed and navigate to login
+  /// Mark onboarding as completed and navigate to home page
   Future<void> _completeOnboarding() async {
+    print('═══════════════════════════════════════');
+    print('✅ GetStartedPage: Completing onboarding');
+    
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasSeenOnboarding', true);
     
+    // Verify it was saved
+    final saved = prefs.getBool('hasSeenOnboarding') ?? false;
+    print('   Flag saved successfully: $saved');
+    print('═══════════════════════════════════════');
+    
     if (mounted) {
-      Navigator.pushReplacementNamed(context, '/login');
+      // Navigate to home page by removing all previous routes
+      // This ensures a clean navigation state
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/home',
+        (route) => false,
+      );
     }
   }
 

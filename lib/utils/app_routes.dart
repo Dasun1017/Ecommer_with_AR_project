@@ -22,12 +22,18 @@ class AppRoutes {
   // 
   // INITIAL FLOW:
   // 1. App opens → AuthWrapper (checks authentication)
-  // 2. Not logged in → GetStartedPage (onboarding)
-  // 3. GetStarted/Skip → LoginPage
-  // 4. Login success → AuthWrapper detects auth change
-  // 5. AuthWrapper checks role in Firestore:
+  // 2. First launch → GetStartedPage (onboarding)
+  // 3. GetStarted/Skip → HomePage (guest browsing)
+  // 4. HomePage allows browsing products without login
+  // 5. When accessing authenticated features (Cart, Profile, etc.) → Login prompt
+  // 6. After login → AuthWrapper checks role in Firestore:
   //    - role = 'admin' → AdminDashboard (ADMIN SIDE)
-  //    - role = 'client' → HomePage (CLIENT SIDE)
+  //    - role = 'client' → HomePage (CLIENT SIDE with full access)
+  //
+  // GUEST BROWSING:
+  // - Users can view home page and browse products without logging in
+  // - Authentication required for: Cart, Checkout, Profile, Orders, Notifications
+  // - Login prompts appear when accessing protected features
   //
   // NAVIGATION SEPARATION:
   // - Admin Side: AdminDashboard → only navigates to admin/* routes

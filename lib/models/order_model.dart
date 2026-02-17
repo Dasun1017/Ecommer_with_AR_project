@@ -52,8 +52,7 @@ class Order {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
+    final json = {
       'userId': userId,
       'items': items.map((item) => item.toJson()).toList(),
       'totalAmount': totalAmount,
@@ -63,6 +62,13 @@ class Order {
       'createdAt': createdAt.toIso8601String(),
       'deliveredAt': deliveredAt?.toIso8601String(),
     };
+    
+    // Only include 'id' if it's not empty (for existing orders)
+    if (id.isNotEmpty) {
+      json['id'] = id;
+    }
+    
+    return json;
   }
 }
 

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import '../services/order_service.dart';
+import '../services/cart_service.dart';
+import '../services/notification_service.dart';
 import '../models/user_model.dart';
 import '../models/order_model.dart' as models;
 import 'edit_profile_page.dart';
@@ -9,6 +12,7 @@ import 'order_details_page.dart';
 import 'wishlist_page.dart';
 import 'settings_page.dart';
 import 'help_support_page.dart';
+import 'payment_methods_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -18,8 +22,11 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  int _selectedIndex = 4; // Profile page index
   final AuthService _authService = AuthService();
   final OrderService _orderService = OrderService();
+  final CartService _cartService = CartService();
+  final NotificationService _notificationService = NotificationService();
   UserModel? _user;
   bool _isLoading = true;
 
@@ -102,6 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
+      bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
@@ -188,9 +196,10 @@ class _ProfilePageState extends State<ProfilePage> {
           icon: Icons.payment,
           title: 'Payment Methods',
           onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Payment methods feature coming soon!'),
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PaymentMethodsPage(),
               ),
             );
           },
@@ -449,5 +458,198 @@ class _ProfilePageState extends State<ProfilePage> {
         Navigator.pushReplacementNamed(context, '/login');
       }
     }
+  }
+
+  void _requireAuth(VoidCallback onAuthenticated) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      // User not logged in, show login prompt
+      _showLoginPrompt();
+    } else {
+      // User is logged in, proceed with action
+      onAuthenticated();
+    }
+  }
+
+  /// Show dialog prompting user to login
+  void _showLoginPrompt() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Login Required'),
+        content: const Text('Please login to access this feature'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/login');
+            },
+            child: const Text('Login'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomNavBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.blue.shade100,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade300,
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          switch (index) {
+            case 0:
+              Navigator.pushReplacementNamed(context, '/home');
+              break;
+            case 1:
+              Navigator.pushReplacementNamed(context, '/shop');
+              break;
+            case 2:
+              // Try AR - will be implemented later
+              break;
+            case 3:
+              // Cart - requires authentication
+              _requireAuth(() {
+                Navigator.pushNamed(context, '/cart');
+              });
+              break;
+            case 4:
+              // Profile - already here
+              break;
+          }
+        },
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.blue.shade100,
+        selectedItemColor: Colors.blue.shade700,
+        unselectedItemColor: Colors.grey.shade600,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        selectedFontSize: 12,
+        unselectedFontSize: 11,
+        elevation: 0,
+        items: [
+          BottomNavigationBarItem(
+            icon: _selectedIndex == 0
+                ? Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade300,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.home, color: Colors.blue.shade900, size: 24),
+                  )
+                : const Icon(Icons.home, size: 24),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: _selectedIndex == 1
+                ? Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade300,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.shopping_bag, color: Colors.blue.shade900, size: 24),
+                  )
+                : const Icon(Icons.shopping_bag, size: 24),
+            label: 'Shop',
+          ),
+          BottomNavigationBarItem(
+            icon: _selectedIndex == 2
+                ? Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade300,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.camera_alt, color: Colors.blue.shade900, size: 24),
+                  )
+                : const Icon(Icons.camera_alt, size: 24),
+            label: 'Try AR',
+          ),
+          BottomNavigationBarItem(
+            icon: _buildCartIcon(),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: _selectedIndex == 4
+                ? Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade300,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.person, color: Colors.blue.shade900, size: 24),
+                  )
+                : const Icon(Icons.person, size: 24),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCartIcon() {
+    final user = FirebaseAuth.instance.currentUser;
+    
+    if (user == null) {
+      // User not logged in, show icon without badge
+      return _selectedIndex == 3
+          ? Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade300,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.shopping_cart_outlined, color: Colors.blue.shade900, size: 24),
+            )
+          : const Icon(Icons.shopping_cart_outlined, size: 24);
+    }
+
+    // User logged in, show cart count badge
+    return StreamBuilder<List<dynamic>>(
+      stream: _cartService.getCartItems(user.uid),
+      builder: (context, snapshot) {
+        final itemCount = snapshot.hasData ? snapshot.data!.length : 0;
+        
+        final icon = _selectedIndex == 3
+            ? Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade300,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.shopping_cart_outlined, color: Colors.blue.shade900, size: 24),
+              )
+            : const Icon(Icons.shopping_cart_outlined, size: 24);
+
+        if (itemCount == 0) {
+          return icon;
+        }
+
+        return Badge(
+          label: Text('$itemCount'),
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          child: icon,
+        );
+      },
+    );
   }
 }

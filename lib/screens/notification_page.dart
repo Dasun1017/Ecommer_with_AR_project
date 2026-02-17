@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import '../services/notification_service.dart';
 import '../services/auth_service.dart';
+import '../services/order_service.dart';
 import '../models/notification_model.dart';
+import '../models/order_model.dart' as models;
+import 'order_details_page.dart';
+import 'orders_page.dart';
 import 'package:intl/intl.dart';
 
 class NotificationPage extends StatefulWidget {
@@ -14,6 +18,7 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   final NotificationService _notificationService = NotificationService();
   final AuthService _authService = AuthService();
+  final OrderService _orderService = OrderService();
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +130,7 @@ class _NotificationPageState extends State<NotificationPage> {
             await _notificationService.markAsRead(notification.id);
           }
           // Handle notification tap based on type
+          _handleNotificationTap(notification);
         },
         child: Container(
           color: notification.isRead ? Colors.white : Colors.blue[50],
@@ -220,4 +226,117 @@ class _NotificationPageState extends State<NotificationPage> {
       return 'Just now';
     }
   }
+
+  void _handleNotificationTap(NotificationModel notification) async {
+    // Navigate based on notification type and data
+    switch (notification.type) {
+      case NotificationType.order:
+        if (notification.data != null && notification.data!.containsKey('orderId')) {
+          final orderId = notification.data!['orderId'];
+          
+          // Show loading indicator
+          if (context.mounted) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          
+          try {
+            // Fetch the order details
+            final order = await _orderService.getOrderById(orderId);
+            
+            if (context.mounted) {
+              // Close loading dialog
+              Navigator.pop(context);
+              
+              if (order != null) {
+                // Navigate to order details page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OrderDetailsPage(order: order),
+                  ),
+                );
+              } else {
+                // Order not found - navigate to orders page instead
+                _showOrderNotFoundDialog();
+              }
+            }
+          } catch (e) {
+            if (context.mounted) {
+              // Close loading dialog
+              Navigator.pop(context);
+              
+              // Show helpful error dialog
+              _showOrderNotFoundDialog();
+            }
+          }
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const OrdersPage(),
+            ),
+          );
+        }
+        break;
+      case NotificationType.product:
+        if (notification.data != null && notification.data!.containsKey('productId')) {
+          Navigator.pushNamed(
+            context,
+            '/product-details',
+            arguments: notification.data!['productId'],
+          );
+        } else {
+          Navigator.pushNamed(context, '/shop');
+        }
+        break;
+      case NotificationType.promotion:
+        Navigator.pushNamed(context, '/shop');
+        break;
+      case NotificationType.system:
+        // Stay on notification page for system messages
+        break;
+    }
+  }
+
+  void _showOrderNotFoundDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Order Not Found'),
+        content: const Text(
+          'This order could not be found. This may be an older notification. '
+          'Would you like to view all your orders instead?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const OrdersPage(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green[700],
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('View Orders'),
+          ),
+        ],
+      ),
+    );
+  }
 }
+

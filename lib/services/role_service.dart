@@ -67,4 +67,67 @@ class RoleService {
   Future<bool> checkAdminPermission(String userId) async {
     return await isAdmin(userId);
   }
+
+  /// 🔧 ADMIN SETUP UTILITY
+  /// Use this to manually set a user as admin in Firestore
+  /// Call this from main.dart or a debug page
+  Future<void> setUserAsAdmin(String userId, {String? email, String? name}) async {
+    try {
+      print('🔧 Setting user as admin: $userId');
+      
+      // Check if user document exists
+      final docRef = _firestore.collection('users').doc(userId);
+      final doc = await docRef.get();
+      
+      if (!doc.exists) {
+        // Create new user document with admin role
+        await docRef.set({
+          'id': userId,
+          'email': email ?? 'admin@example.com',
+          'name': name ?? 'Admin',
+          'role': 'admin',
+          'createdAt': DateTime.now().toIso8601String(),
+          'updatedAt': DateTime.now().toIso8601String(),
+        });
+        print('✅ Created new admin user document');
+      } else {
+        // Update existing user document to admin role
+        await docRef.update({
+          'role': 'admin',
+          'updatedAt': DateTime.now().toIso8601String(),
+        });
+        print('✅ Updated existing user to admin role');
+      }
+      
+      // Verify the role was set
+      final verifyDoc = await docRef.get();
+      final role = verifyDoc.data()?['role'];
+      print('✅ Verified: User role is now "$role"');
+      
+    } catch (e) {
+      print('❌ Error setting user as admin: $e');
+      throw Exception('Failed to set user as admin: $e');
+    }
+  }
+
+  /// 🔧 Batch set multiple users as admin by email
+  Future<void> setUsersAsAdminByEmail(List<String> emails) async {
+    try {
+      final usersQuery = await _firestore
+          .collection('users')
+          .where('email', whereIn: emails)
+          .get();
+      
+      for (var doc in usersQuery.docs) {
+        await doc.reference.update({
+          'role': 'admin',
+          'updatedAt': DateTime.now().toIso8601String(),
+        });
+        print('✅ Set ${doc.data()['email']} as admin');
+      }
+    } catch (e) {
+      print('❌ Error setting users as admin: $e');
+      throw Exception('Failed to set users as admin: $e');
+    }
+  }
 }

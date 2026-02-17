@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../auth_wrapper.dart';
+import '../utils/notification_helper.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -430,6 +431,12 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
         name: _nameController.text.trim(),
       );
 
+      // Send welcome notification to new user
+      final userId = _authService.currentUser?.uid;
+      if (userId != null) {
+        await NotificationHelper.sendWelcomeNotification(userId);
+      }
+
       if (context.mounted) {
         // Small delay to ensure auth state is fully updated
         await Future.delayed(const Duration(milliseconds: 300));
@@ -474,6 +481,12 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
 
     try {
       await _authService.signInWithGoogle();
+
+      // Send welcome notification to new user
+      final userId = _authService.currentUser?.uid;
+      if (userId != null) {
+        await NotificationHelper.sendWelcomeNotification(userId);
+      }
 
       if (context.mounted) {
         // Small delay to ensure auth state is fully updated

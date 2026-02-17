@@ -254,6 +254,44 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                           ),
                         ),
                       ),
+                      if (product.brand != null || product.material != null) const SizedBox(height: 4),
+                      if (product.brand != null || product.material != null)
+                        Row(
+                          children: [
+                            if (product.brand != null) ...[
+                              Icon(Icons.business, size: 12, color: Colors.grey[600]),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  product.brand!,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[700],
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ],
+                            if (product.brand != null && product.material != null)
+                              const SizedBox(width: 12),
+                            if (product.material != null) ...[
+                              Icon(Icons.texture, size: 12, color: Colors.grey[600]),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  product.material!,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[700],
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       const SizedBox(height: 8),
                       Text(
                         'LKR ${product.price.toStringAsFixed(2)}',
@@ -294,9 +332,9 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                 ),
               ],
             ),
-            if (product.colors.isNotEmpty || product.sizes.isNotEmpty || product.arModelUrl != null)
+            if (product.colors.isNotEmpty || product.sizes.isNotEmpty || product.arModelUrl != null || product.tags.isNotEmpty)
               const Divider(height: 24),
-            if (product.colors.isNotEmpty || product.sizes.isNotEmpty || product.arModelUrl != null)
+            if (product.colors.isNotEmpty || product.sizes.isNotEmpty || product.arModelUrl != null || product.tags.isNotEmpty)
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -381,6 +419,30 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                         ],
                       ),
                     ),
+                  if (product.tags.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.teal[50],
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: Colors.teal[200]!),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.label, size: 14, color: Colors.teal),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              product.tags.join(', '),
+                              style: const TextStyle(fontSize: 12),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             const Divider(height: 24),
@@ -419,11 +481,14 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
     final priceController = TextEditingController();
     final descriptionController = TextEditingController();
     final categoryController = TextEditingController();
+    final brandController = TextEditingController();
+    final materialController = TextEditingController();
     final stockController = TextEditingController();
     final imageUrlsController = TextEditingController();
     final arModelUrlController = TextEditingController();
     final colorsController = TextEditingController();
     final sizesController = TextEditingController();
+    final tagsController = TextEditingController();
     bool isFeatured = false;
 
     showDialog(
@@ -460,6 +525,34 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                       prefixIcon: const Icon(Icons.category),
                       hintText: 'e.g., Clothing, Electronics',
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: brandController,
+                          decoration: InputDecoration(
+                            labelText: 'Brand',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            prefixIcon: const Icon(Icons.business),
+                            hintText: 'e.g., Nike, Apple',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: materialController,
+                          decoration: InputDecoration(
+                            labelText: 'Material',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            prefixIcon: const Icon(Icons.texture),
+                            hintText: 'e.g., Cotton, Polyester',
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   Row(
@@ -629,12 +722,25 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                         .toList();
                   }
                   
+                  // Parse tags
+                  List<String> tagsList = [];
+                  if (tagsController.text.isNotEmpty) {
+                    tagsList = tagsController.text
+                        .split(',')
+                        .map((tag) => tag.trim())
+                        .where((tag) => tag.isNotEmpty)
+                        .toList();
+                  }
+                  
                   final product = Product(
                     id: docRef.id,
                     name: nameController.text,
                     category: categoryController.text,
+                    brand: brandController.text.isNotEmpty ? brandController.text : null,
+                    material: materialController.text.isNotEmpty ? materialController.text : null,
                     price: double.parse(priceController.text),
                     stock: int.parse(stockController.text),
+                    soldAmount: 0,
                     description: descriptionController.text,
                     images: imagesList,
                     arModelUrl: arModelUrlController.text.isNotEmpty ? arModelUrlController.text : null,
@@ -642,6 +748,7 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                     reviewCount: 0,
                     colors: colorsList,
                     sizes: sizesList,
+                    tags: tagsList,
                     isFeatured: isFeatured,
                     createdAt: DateTime.now(),
                   );
@@ -681,11 +788,14 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
     final priceController = TextEditingController(text: product.price.toString());
     final descriptionController = TextEditingController(text: product.description);
     final categoryController = TextEditingController(text: product.category);
+    final brandController = TextEditingController(text: product.brand ?? '');
+    final materialController = TextEditingController(text: product.material ?? '');
     final stockController = TextEditingController(text: product.stock.toString());
     final imageUrlsController = TextEditingController(text: product.images.join(', '));
     final arModelUrlController = TextEditingController(text: product.arModelUrl ?? '');
     final colorsController = TextEditingController(text: product.colors.join(', '));
     final sizesController = TextEditingController(text: product.sizes.join(', '));
+    final tagsController = TextEditingController(text: product.tags.join(', '));
     bool isFeatured = product.isFeatured;
 
     showDialog(
@@ -721,6 +831,34 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                       prefixIcon: const Icon(Icons.category),
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: brandController,
+                          decoration: InputDecoration(
+                            labelText: 'Brand',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            prefixIcon: const Icon(Icons.business),
+                            hintText: 'e.g., Nike, Apple',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: materialController,
+                          decoration: InputDecoration(
+                            labelText: 'Material',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            prefixIcon: const Icon(Icons.texture),
+                            hintText: 'e.g., Cotton, Polyester',
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   Row(
@@ -811,6 +949,16 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  TextField(
+                    controller: tagsController,
+                    decoration: InputDecoration(
+                      labelText: 'Tags',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      prefixIcon: const Icon(Icons.label),
+                      hintText: 'e.g., sale, new, trending (comma separated)',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   CheckboxListTile(
                     title: const Text('Featured Product'),
                     subtitle: const Text('Show on home page'),
@@ -850,6 +998,18 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                             const Icon(Icons.rate_review, color: Colors.blue, size: 20),
                             const SizedBox(width: 4),
                             Text('Reviews: ${product.reviewCount}'),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(Icons.shopping_cart, color: Colors.green, size: 20),
+                            const SizedBox(width: 4),
+                            Text('Sold: ${product.soldAmount}'),
+                            const SizedBox(width: 16),
+                            const Icon(Icons.inventory, color: Colors.orange, size: 20),
+                            const SizedBox(width: 4),
+                            Text('Stock: ${product.stock}'),
                           ],
                         ),
                       ],
@@ -915,17 +1075,35 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                         .where((size) => size.isNotEmpty)
                         .toList();
                   }
+                  
+                  // Parse tags
+                  List<String> tagsList = [];
+                  if (tagsController.text.isNotEmpty) {
+                    tagsList = tagsController.text
+                        .split(',')
+                        .map((tag) => tag.trim())
+                        .where((tag) => tag.isNotEmpty)
+                        .toList();
+                  }
 
                   await _firestore.collection('products').doc(product.id).update({
                     'name': nameController.text,
                     'category': categoryController.text,
+                    'brand': brandController.text.isNotEmpty ? brandController.text : null,
+                    'material': materialController.text.isNotEmpty ? materialController.text : null,
                     'price': double.parse(priceController.text),
                     'stock': int.parse(stockController.text),
+                    'stock_amount': int.parse(stockController.text),
                     'description': descriptionController.text,
                     'images': imagesList,
+                    'image_2d': imagesList,
+                    'image_3d': imagesList,
                     'arModelUrl': arModelUrlController.text.isNotEmpty ? arModelUrlController.text : null,
                     'colors': colorsList,
+                    'color': colorsList,
                     'sizes': sizesList,
+                    'size': sizesList,
+                    'tags': tagsList,
                     'isFeatured': isFeatured,
                   });
 

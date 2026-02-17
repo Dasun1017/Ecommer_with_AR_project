@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/product_service.dart';
 import '../services/wishlist_service.dart';
 import '../services/auth_service.dart';
+import '../services/cart_service.dart';
+import '../services/notification_service.dart';
 import '../models/product_model.dart';
 
 class ShopPage extends StatefulWidget {
@@ -15,11 +18,49 @@ class _ShopPageState extends State<ShopPage> {
   final ProductService _productService = ProductService();
   final WishlistService _wishlistService = WishlistService();
   final AuthService _authService = AuthService();
+  final CartService _cartService = CartService();
+  final NotificationService _notificationService = NotificationService();
   String? _selectedCategory;
   String _sortBy = 'newest';
   int _selectedIndex = 1;
   bool _isCategorySidebarExpanded = false;
   List<String> _wishlistIds = [];
+
+  /// Check if user is authenticated, if not prompt to login
+  void _requireAuth(VoidCallback onAuthenticated) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      // User not logged in, show login prompt
+      _showLoginPrompt();
+    } else {
+      // User is logged in, proceed with action
+      onAuthenticated();
+    }
+  }
+
+  /// Show dialog prompting user to login
+  void _showLoginPrompt() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Login Required'),
+        content: const Text('Please login to access this feature'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/login');
+            },
+            child: const Text('Login'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -133,10 +174,7 @@ class _ShopPageState extends State<ShopPage> {
               },
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, size: 28),
-            onPressed: () => Navigator.pushNamed(context, '/notifications'),
-          ),
+          _buildNotificationIcon(),
         ],
       ),
     );
@@ -717,10 +755,16 @@ class _ShopPageState extends State<ShopPage> {
               // Try AR - will be implemented later
               break;
             case 3:
-              Navigator.pushNamed(context, '/cart');
+              // Cart - requires authentication
+              _requireAuth(() {
+                Navigator.pushNamed(context, '/cart');
+              });
               break;
             case 4:
-              Navigator.pushNamed(context, '/profile');
+              // Profile - requires authentication
+              _requireAuth(() {
+                Navigator.pushNamed(context, '/profile');
+              });
               break;
           }
         },
@@ -774,16 +818,7 @@ class _ShopPageState extends State<ShopPage> {
             label: 'Try AR',
           ),
           BottomNavigationBarItem(
-            icon: _selectedIndex == 3
-                ? Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade300,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.shopping_cart_outlined, color: Colors.blue.shade900, size: 24),
-                  )
-                : const Icon(Icons.shopping_cart_outlined, size: 24),
+            icon: _buildCartIcon(),
             label: 'Cart',
           ),
           BottomNavigationBarItem(
@@ -801,6 +836,89 @@ class _ShopPageState extends State<ShopPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCartIcon() {
+    final user = FirebaseAuth.instance.currentUser;
+    
+    if (user == null) {
+      // User not logged in, show icon without badge
+      return _selectedIndex == 3
+          ? Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade300,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.shopping_cart_outlined, color: Colors.blue.shade900, size: 24),
+            )
+          : const Icon(Icons.shopping_cart_outlined, size: 24);
+    }
+
+    // User logged in, show cart count badge
+    return StreamBuilder<List<dynamic>>(
+      stream: _cartService.getCartItems(user.uid),
+      builder: (context, snapshot) {
+        final itemCount = snapshot.hasData ? snapshot.data!.length : 0;
+        
+        final icon = _selectedIndex == 3
+            ? Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade300,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.shopping_cart_outlined, color: Colors.blue.shade900, size: 24),
+              )
+            : const Icon(Icons.shopping_cart_outlined, size: 24);
+
+        if (itemCount == 0) {
+          return icon;
+        }
+
+        return Badge(
+          label: Text('$itemCount'),
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          child: icon,
+        );
+      },
+    );
+  }
+
+  Widget _buildNotificationIcon() {
+    final user = FirebaseAuth.instance.currentUser;
+    
+    if (user == null) {
+      return IconButton(
+        icon: const Icon(Icons.notifications_outlined, size: 28),
+        onPressed: () => Navigator.pushNamed(context, '/notifications'),
+      );
+    }
+
+    return StreamBuilder<int>(
+      stream: _notificationService.getUnreadCount(user.uid),
+      builder: (context, snapshot) {
+        final unreadCount = snapshot.hasData ? snapshot.data! : 0;
+
+        if (unreadCount == 0) {
+          return IconButton(
+            icon: const Icon(Icons.notifications_outlined, size: 28),
+            onPressed: () => Navigator.pushNamed(context, '/notifications'),
+          );
+        }
+
+        return IconButton(
+          icon: Badge(
+            label: Text('$unreadCount'),
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            child: const Icon(Icons.notifications_outlined, size: 28),
+          ),
+          onPressed: () => Navigator.pushNamed(context, '/notifications'),
+        );
+      },
     );
   }
 }
