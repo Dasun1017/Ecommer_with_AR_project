@@ -4,6 +4,13 @@ import '../models/cart_item_model.dart';
 class CartService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // Generate unique cart item ID based on product, color, and size
+  String _generateCartItemId(String productId, String? color, String? size) {
+    final colorPart = color ?? 'nocolor';
+    final sizePart = size ?? 'nosize';
+    return '${productId}_${colorPart}_$sizePart';
+  }
+
   // Get cart items for user
   Stream<List<CartItem>> getCartItems(String userId) {
     return _firestore
@@ -19,28 +26,48 @@ class CartService {
   // Add item to cart
   Future<void> addToCart(String userId, CartItem item) async {
     try {
-      await _firestore
+      // Generate unique cart item ID based on product, color, and size
+      final cartItemId = _generateCartItemId(
+        item.productId,
+        item.selectedColor,
+        item.selectedSize,
+      );
+
+      // Check if item with same product/color/size already exists
+      final docRef = _firestore
           .collection('carts')
           .doc(userId)
           .collection('items')
-          .doc(item.productId)
-          .set(item.toJson());
+          .doc(cartItemId);
+
+      final doc = await docRef.get();
+      
+      if (doc.exists) {
+        // Item exists, increase quantity
+        final existingItem = CartItem.fromJson({...doc.data()!, 'id': doc.id});
+        final newQuantity = existingItem.quantity + item.quantity;
+        await docRef.update({'quantity': newQuantity});
+      } else {
+        // New item, add to cart with generated ID
+        final updatedItem = item.copyWith(id: cartItemId);
+        await docRef.set(updatedItem.toJson());
+      }
     } catch (e) {
       throw Exception('Failed to add item to cart: $e');
     }
   }
 
   // Update cart item quantity
-  Future<void> updateCartItemQuantity(String userId, String productId, int quantity) async {
+  Future<void> updateCartItemQuantity(String userId, String cartItemId, int quantity) async {
     try {
       if (quantity <= 0) {
-        await removeFromCart(userId, productId);
+        await removeFromCart(userId, cartItemId);
       } else {
         await _firestore
             .collection('carts')
             .doc(userId)
             .collection('items')
-            .doc(productId)
+            .doc(cartItemId)
             .update({'quantity': quantity});
       }
     } catch (e) {
@@ -49,13 +76,13 @@ class CartService {
   }
 
   // Remove item from cart
-  Future<void> removeFromCart(String userId, String productId) async {
+  Future<void> removeFromCart(String userId, String cartItemId) async {
     try {
       await _firestore
           .collection('carts')
           .doc(userId)
           .collection('items')
-          .doc(productId)
+          .doc(cartItemId)
           .delete();
     } catch (e) {
       throw Exception('Failed to remove item from cart: $e');

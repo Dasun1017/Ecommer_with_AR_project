@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
 import '../models/order_model.dart' as models;
+import '../models/notification_model.dart';
+import '../services/order_service.dart';
+import '../services/notification_service.dart';
+import '../services/auth_service.dart';
 
-class OrderDetailsPage extends StatelessWidget {
+class OrderDetailsPage extends StatefulWidget {
   final models.Order order;
 
   const OrderDetailsPage({super.key, required this.order});
+
+  @override
+  State<OrderDetailsPage> createState() => _OrderDetailsPageState();
+}
+
+class _OrderDetailsPageState extends State<OrderDetailsPage> {
+  final OrderService _orderService = OrderService();
+  final NotificationService _notificationService = NotificationService();
+  final AuthService _authService = AuthService();
+  bool _isCancelling = false;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +64,7 @@ class OrderDetailsPage extends StatelessWidget {
                 ),
               ),
               Text(
-                '#${order.id.substring(0, 8).toUpperCase()}',
+                '#${widget.order.id.substring(0, 8).toUpperCase()}',
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -70,12 +84,12 @@ class OrderDetailsPage extends StatelessWidget {
                 ),
               ),
               Text(
-                _formatDate(order.createdAt),
+                _formatDate(widget.order.createdAt),
                 style: const TextStyle(fontSize: 14),
               ),
             ],
           ),
-          if (order.deliveredAt != null) ...[
+          if (widget.order.deliveredAt != null) ...[
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,7 +102,7 @@ class OrderDetailsPage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  _formatDate(order.deliveredAt!),
+                  _formatDate(widget.order.deliveredAt!),
                   style: const TextStyle(fontSize: 14),
                 ),
               ],
@@ -128,8 +142,8 @@ class OrderDetailsPage extends StatelessWidget {
       models.OrderStatus.delivered,
     ];
 
-    final currentIndex = statusSteps.indexOf(order.status);
-    final isCancelled = order.status == models.OrderStatus.cancelled;
+    final currentIndex = statusSteps.indexOf(widget.order.status);
+    final isCancelled = widget.order.status == models.OrderStatus.cancelled;
 
     if (isCancelled) {
       return Container(
@@ -228,14 +242,14 @@ class OrderDetailsPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Items (${order.items.length})',
+            'Items (${widget.order.items.length})',
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 12),
-          ...order.items.map((item) => _buildOrderItemCard(item)),
+          ...widget.order.items.map((item) => _buildOrderItemCard(item)),
         ],
       ),
     );
@@ -337,20 +351,20 @@ class OrderDetailsPage extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  order.shippingAddress,
+                  widget.order.shippingAddress,
                   style: const TextStyle(fontSize: 14),
                 ),
               ),
             ],
           ),
-          if (order.paymentMethod != null) ...[
+          if (widget.order.paymentMethod != null) ...[
             const SizedBox(height: 12),
             Row(
               children: [
                 const Icon(Icons.payment, color: Colors.grey),
                 const SizedBox(width: 12),
                 Text(
-                  'Payment: ${order.paymentMethod}',
+                  'Payment: ${widget.order.paymentMethod}',
                   style: const TextStyle(fontSize: 14),
                 ),
               ],
@@ -362,7 +376,7 @@ class OrderDetailsPage extends StatelessWidget {
   }
 
   Widget _buildPricingDetails(BuildContext context) {
-    final subtotal = order.items.fold<double>(
+    final subtotal = widget.order.items.fold<double>(
       0,
       (sum, item) => sum + item.totalPrice,
     );
@@ -397,7 +411,7 @@ class OrderDetailsPage extends StatelessWidget {
                 ),
               ),
               Text(
-                'Rs. ${order.totalAmount.toStringAsFixed(2)}',
+                'Rs. ${widget.order.totalAmount.toStringAsFixed(2)}',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -431,7 +445,7 @@ class OrderDetailsPage extends StatelessWidget {
   }
 
   Widget _buildBottomBar(BuildContext context) {
-    if (order.status == models.OrderStatus.delivered) {
+    if (widget.order.status == models.OrderStatus.delivered) {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -474,7 +488,7 @@ class OrderDetailsPage extends StatelessWidget {
       );
     }
 
-    if (order.status == models.OrderStatus.pending) {
+    if (widget.order.status == models.OrderStatus.pending) {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -488,7 +502,7 @@ class OrderDetailsPage extends StatelessWidget {
           ],
         ),
         child: ElevatedButton(
-          onPressed: () {
+          onPressed: _isCancelling ? null : () {
             // Cancel order
             _showCancelDialog(context);
           },
@@ -496,7 +510,16 @@ class OrderDetailsPage extends StatelessWidget {
             backgroundColor: Colors.red,
             minimumSize: const Size(double.infinity, 50),
           ),
-          child: const Text('Cancel Order'),
+          child: _isCancelling
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : const Text('Cancel Order'),
         ),
       );
     }
@@ -509,24 +532,88 @@ class OrderDetailsPage extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Cancel Order'),
-        content: const Text('Are you sure you want to cancel this order?'),
+        content: const Text(
+          'Are you sure you want to cancel this order? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('No'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Order cancellation functionality coming soon!')),
-              );
+              await _cancelOrder();
             },
-            child: const Text('Yes, Cancel'),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Yes, Cancel Order'),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _cancelOrder() async {
+    setState(() {
+      _isCancelling = true;
+    });
+
+    try {
+      // Cancel the order in Firestore
+      await _orderService.cancelOrder(widget.order.id);
+
+      // Send notification to user about cancellation
+      final userId = _authService.currentUser?.uid;
+      if (userId != null) {
+        final notification = NotificationModel(
+          id: '',
+          userId: userId,
+          title: '🚫 Order Cancelled',
+          body: 'Your order #${widget.order.id.substring(0, 8).toUpperCase()} has been cancelled successfully.',
+          type: NotificationType.order,
+          isRead: false,
+          createdAt: DateTime.now(),
+          data: {'orderId': widget.order.id},
+        );
+        await _notificationService.sendNotification(notification);
+      }
+
+      if (mounted) {
+        setState(() {
+          _isCancelling = false;
+        });
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Order cancelled successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigate back to orders page after a short delay
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) {
+          Navigator.pop(context, true); // Return true to indicate order was cancelled
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isCancelling = false;
+        });
+
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to cancel order: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   String _getStatusLabel(models.OrderStatus status) {

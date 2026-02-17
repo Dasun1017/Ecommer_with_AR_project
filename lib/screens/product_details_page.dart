@@ -141,10 +141,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart_outlined),
-            onPressed: () => Navigator.pushNamed(context, '/cart'),
-          ),
+          _buildCartIconWithBadge(),
         ],
       ),
       body: Column(
@@ -1216,5 +1213,40 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   void _buyNow() {
     _addToCart();
     Navigator.pushNamed(context, '/cart');
+  }
+
+  Widget _buildCartIconWithBadge() {
+    final userId = _authService.currentUser?.uid;
+    
+    if (userId == null) {
+      return IconButton(
+        icon: const Icon(Icons.shopping_cart_outlined),
+        onPressed: () => Navigator.pushNamed(context, '/cart'),
+      );
+    }
+
+    return StreamBuilder<List<dynamic>>(
+      stream: _cartService.getCartItems(userId),
+      builder: (context, snapshot) {
+        final itemCount = snapshot.hasData ? snapshot.data!.length : 0;
+
+        if (itemCount == 0) {
+          return IconButton(
+            icon: const Icon(Icons.shopping_cart_outlined),
+            onPressed: () => Navigator.pushNamed(context, '/cart'),
+          );
+        }
+
+        return IconButton(
+          icon: Badge(
+            label: Text('$itemCount'),
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            child: const Icon(Icons.shopping_cart_outlined),
+          ),
+          onPressed: () => Navigator.pushNamed(context, '/cart'),
+        );
+      },
+    );
   }
 }

@@ -4,6 +4,7 @@ import '../services/cart_service.dart';
 import '../services/auth_service.dart';
 import '../models/cart_item_model.dart';
 import '../models/order_model.dart' as models;
+import '../utils/notification_helper.dart';
 
 class CheckoutPage extends StatefulWidget {
   final List<CartItem> items;
@@ -349,7 +350,7 @@ ${_cityController.text}, ${_zipController.text}
 ''';
 
     final order = models.Order(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: '', // Will be set by Firestore
       userId: userId,
       items: widget.items.map((item) => models.OrderItem(
         productId: item.productId,
@@ -368,8 +369,15 @@ ${_cityController.text}, ${_zipController.text}
     );
 
     try {
-      await _orderService.createOrder(order);
+      final orderId = await _orderService.createOrder(order);
       await _cartService.clearCart(userId);
+      
+      // Send order placed notification with the actual Firestore document ID
+      await NotificationHelper.sendOrderPlacedNotification(
+        userId,
+        orderId,
+        widget.total,
+      );
       
       if (context.mounted) {
         setState(() {

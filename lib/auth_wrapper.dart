@@ -12,12 +12,17 @@ import 'screens/admin/admin_dashboard.dart';
 /// FLOW:
 /// 1. App Start → AuthWrapper (set as home in main.dart)
 /// 2. Check if first launch (onboarding not seen) → GetStartedPage
-/// 3. GetStartedPage → LoginPage
-/// 4. After successful login → Pop back to AuthWrapper
-/// 5. AuthWrapper detects auth change and checks user role
+/// 3. GetStartedPage → HomePage (guest browsing allowed)
+/// 4. HomePage prompts for login when accessing authenticated features (Cart, Profile, etc.)
+/// 5. After successful login → AuthWrapper detects auth change and checks user role
 /// 6. Routes based on role:
 ///    - role = 'admin' → AdminDashboard (ADMIN SIDE)
-///    - role = 'client' → HomePage (CLIENT SIDE)
+///    - role = 'client' → HomePage (CLIENT SIDE with full access)
+/// 
+/// GUEST BROWSING:
+/// - Users can browse home page and products without logging in
+/// - Features requiring authentication (Cart, Profile, Checkout, etc.) prompt for login
+/// - After login, users get full access based on their role
 /// 
 /// NAVIGATION SEPARATION:
 /// - Admin pages (AdminDashboard, ManageProducts, etc.) ONLY navigate to admin routes
@@ -31,7 +36,7 @@ class AuthWrapper extends StatefulWidget {
 }
 
 class _AuthWrapperState extends State<AuthWrapper> {
-  bool _isFirstLaunch = true;
+  bool _isFirstLaunch = false;
   bool _isCheckingFirstLaunch = true;
 
   @override
@@ -44,7 +49,14 @@ class _AuthWrapperState extends State<AuthWrapper> {
     final prefs = await SharedPreferences.getInstance();
     final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
     
+    print('═══════════════════════════════════════');
+    print('🔍 AuthWrapper: Checking first launch');
+    print('   hasSeenOnboarding flag: $hasSeenOnboarding');
+    print('   Will show GetStarted: ${!hasSeenOnboarding}');
+    print('═══════════════════════════════════════');
+    
     setState(() {
+      // Only show GetStarted page if user has never seen onboarding
       _isFirstLaunch = !hasSeenOnboarding;
       _isCheckingFirstLaunch = false;
     });
@@ -66,7 +78,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
       return const GetStartedPage();
     }
 
-    // Not first launch - check authentication normally
+    // Not first launch - allow browsing home page without login
+    // Check authentication for role-based routing
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
@@ -79,16 +92,21 @@ class _AuthWrapperState extends State<AuthWrapper> {
           );
         }
 
-        // Not logged in - show login page (onboarding already completed)
+        // Not logged in - show home page (allow browsing as guest)
+        // User will be prompted to login when accessing authenticated features
         if (!snapshot.hasData) {
-          return const LoginPage();
+          return const HomePage();
         }
 
         // Logged in - check role and route accordingly
         final userId = snapshot.data!.uid;
         final userEmail = snapshot.data!.email ?? 'Unknown';
         
-        print('🔐 AuthWrapper: User logged in - ID: $userId, Email: $userEmail');
+        print('═══════════════════════════════════════');
+        print('🔐 AuthWrapper: User logged in');
+        print('   User ID: $userId');
+        print('   Email: $userEmail');
+        print('═══════════════════════════════════════');
         
         return FutureBuilder<String>(
           future: RoleService().getUserRole(userId),
@@ -144,14 +162,18 @@ class _AuthWrapperState extends State<AuthWrapper> {
             // 🔀 SEPARATION POINT - Route based on role
             final role = (roleSnapshot.data ?? 'client').toLowerCase().trim();
             
-            print('👤 AuthWrapper: User role detected = "$role"');
+            print('═══════════════════════════════════════');
+            print('👤 AuthWrapper: Role detected = "$role"');
+            print('═══════════════════════════════════════');
             
             // Route based on role with explicit comparison
             if (role == 'admin') {
               print('✅ Routing to ADMIN Dashboard');
+              print('═══════════════════════════════════════\n');
               return const AdminDashboard();
             } else {
               print('✅ Routing to CLIENT Home Page');
+              print('═══════════════════════════════════════\n');
               return const HomePage();
             }
           },
