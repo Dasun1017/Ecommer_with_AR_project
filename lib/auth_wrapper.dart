@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'services/role_service.dart';
 import 'screens/get_started_page.dart';
-import 'screens/login_page.dart';
 import 'screens/home_page.dart';
 import 'screens/admin/admin_dashboard.dart';
 
