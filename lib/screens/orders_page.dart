@@ -215,7 +215,7 @@ class _OrdersPageState extends State<OrdersPage> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      order.shippingAddress ?? 'No address',
+                      order.shippingAddress,
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: 12,

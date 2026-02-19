@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import '../services/order_service.dart';
 import '../services/cart_service.dart';
-import '../services/notification_service.dart';
 import '../models/user_model.dart';
 import '../models/order_model.dart' as models;
 import 'edit_profile_page.dart';
@@ -26,7 +25,6 @@ class _ProfilePageState extends State<ProfilePage> {
   final AuthService _authService = AuthService();
   final OrderService _orderService = OrderService();
   final CartService _cartService = CartService();
-  final NotificationService _notificationService = NotificationService();
   UserModel? _user;
   bool _isLoading = true;
 

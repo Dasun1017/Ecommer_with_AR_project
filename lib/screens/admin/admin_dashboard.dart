@@ -257,6 +257,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
+
   String _formatRevenue(double amount) {
     if (amount >= 1000000) {
       return 'Rs ${(amount / 1000000).toStringAsFixed(1)}M';
