@@ -17,9 +17,12 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _adminCodeController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  String _selectedRole = 'client'; // Default to client
+  static const String _validAdminCode = 'ADMIN2026'; // Admin verification code
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -42,6 +45,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _adminCodeController.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -798,6 +802,301 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             },
                           ),
                         ),
+                        const SizedBox(height: 24),
+                        // Role Selector - Buttons
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Account Type',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.9),
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                // Client Button
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setDialogState(() {
+                                        _selectedRole = 'client';
+                                        _adminCodeController.clear();
+                                      });
+                                    },
+                                    child: Container(
+                                      height: 70,
+                                      decoration: BoxDecoration(
+                                        gradient: _selectedRole == 'client'
+                                            ? LinearGradient(
+                                                colors: [
+                                                  Colors.blue[400]!,
+                                                  Colors.blue[600]!,
+                                                ],
+                                              )
+                                            : null,
+                                        color: _selectedRole == 'client'
+                                            ? null
+                                            : Colors.white.withOpacity(0.08),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: _selectedRole == 'client'
+                                              ? Colors.blue[300]!
+                                              : Colors.white.withOpacity(0.2),
+                                          width: _selectedRole == 'client' ? 2 : 1.5,
+                                        ),
+                                        boxShadow: _selectedRole == 'client'
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.blue.withOpacity(0.4),
+                                                  blurRadius: 12,
+                                                  offset: const Offset(0, 4),
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.person_outline_rounded,
+                                            color: _selectedRole == 'client'
+                                                ? Colors.white
+                                                : Colors.white.withOpacity(0.6),
+                                            size: 28,
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            'Client',
+                                            style: TextStyle(
+                                              color: _selectedRole == 'client'
+                                                  ? Colors.white
+                                                  : Colors.white.withOpacity(0.6),
+                                              fontSize: 14,
+                                              fontWeight: _selectedRole == 'client'
+                                                  ? FontWeight.bold
+                                                  : FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                // Admin Button
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setDialogState(() {
+                                        _selectedRole = 'admin';
+                                      });
+                                    },
+                                    child: Container(
+                                      height: 70,
+                                      decoration: BoxDecoration(
+                                        gradient: _selectedRole == 'admin'
+                                            ? LinearGradient(
+                                                colors: [
+                                                  Colors.orange[400]!,
+                                                  Colors.orange[600]!,
+                                                ],
+                                              )
+                                            : null,
+                                        color: _selectedRole == 'admin'
+                                            ? null
+                                            : Colors.white.withOpacity(0.08),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: _selectedRole == 'admin'
+                                              ? Colors.orange[300]!
+                                              : Colors.white.withOpacity(0.2),
+                                          width: _selectedRole == 'admin' ? 2 : 1.5,
+                                        ),
+                                        boxShadow: _selectedRole == 'admin'
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.orange.withOpacity(0.4),
+                                                  blurRadius: 12,
+                                                  offset: const Offset(0, 4),
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.admin_panel_settings_rounded,
+                                            color: _selectedRole == 'admin'
+                                                ? Colors.white
+                                                : Colors.white.withOpacity(0.6),
+                                            size: 28,
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            'Admin',
+                                            style: TextStyle(
+                                              color: _selectedRole == 'admin'
+                                                  ? Colors.white
+                                                  : Colors.white.withOpacity(0.6),
+                                              fontSize: 14,
+                                              fontWeight: _selectedRole == 'admin'
+                                                  ? FontWeight.bold
+                                                  : FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        // Admin Code Field (only show when admin is selected)
+                        if (_selectedRole == 'admin') ...[
+                          const SizedBox(height: 24),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.orange.withOpacity(0.2),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withOpacity(0.15),
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(16),
+                                      topRight: Radius.circular(16),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.security,
+                                        color: Colors.orange[300],
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Admin Verification Required',
+                                        style: TextStyle(
+                                          color: Colors.orange[200],
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.08),
+                                    borderRadius: const BorderRadius.only(
+                                      bottomLeft: Radius.circular(16),
+                                      bottomRight: Radius.circular(16),
+                                    ),
+                                  ),
+                                  child: TextFormField(
+                                    controller: _adminCodeController,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      letterSpacing: 2,
+                                    ),
+                                    decoration: InputDecoration(
+                                      labelText: 'Admin Access Code',
+                                      labelStyle: TextStyle(
+                                        color: Colors.white.withOpacity(0.8),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      hintText: 'Enter admin code',
+                                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+                                      prefixIcon: Container(
+                                        margin: const EdgeInsets.all(12),
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.orange.withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: Icon(
+                                          Icons.admin_panel_settings,
+                                          color: Colors.orange[300],
+                                          size: 20,
+                                        ),
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(16),
+                                          bottomRight: Radius.circular(16),
+                                        ),
+                                        borderSide: BorderSide(color: Colors.orange.withOpacity(0.3)),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(16),
+                                          bottomRight: Radius.circular(16),
+                                        ),
+                                        borderSide: BorderSide(color: Colors.orange.withOpacity(0.3)),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(16),
+                                          bottomRight: Radius.circular(16),
+                                        ),
+                                        borderSide: BorderSide(color: Colors.orange, width: 2),
+                                      ),
+                                      errorBorder: OutlineInputBorder(
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(16),
+                                          bottomRight: Radius.circular(16),
+                                        ),
+                                        borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+                                      ),
+                                      focusedErrorBorder: OutlineInputBorder(
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(16),
+                                          bottomRight: Radius.circular(16),
+                                        ),
+                                        borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.transparent,
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                                    ),
+                                    validator: (value) {
+                                      if (_selectedRole == 'admin') {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Admin code is required';
+                                        }
+                                        if (value != _validAdminCode) {
+                                          return 'Invalid admin code';
+                                        }
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 32),
                         // Create Account Button
                         Container(
@@ -888,6 +1187,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
         email: _emailController.text.trim(),
         password: _passwordController.text,
         name: _nameController.text.trim(),
+        role: _selectedRole, // Pass the selected role
       );
 
       // Send welcome notification to new user
@@ -906,7 +1206,9 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Account created successfully! Welcome to Tryverse!',
+                    _selectedRole == 'admin'
+                        ? 'Admin account created successfully! Welcome!'
+                        : 'Account created successfully! Welcome to Tryverse!',
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
@@ -915,7 +1217,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                 ),
               ],
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: _selectedRole == 'admin' ? Colors.orange[700] : Colors.green,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(

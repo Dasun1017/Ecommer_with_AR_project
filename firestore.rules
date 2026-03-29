@@ -11,7 +11,7 @@ service cloud.firestore {
     // Users collection - users can read/write their own data
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read: if isAdmin(); // Admins can read all user data
+      allow read, write: if isAdmin(); // Admins can manage all users
     }
     
     // Products collection - anyone can read, only admins can write
