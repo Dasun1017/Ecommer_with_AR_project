@@ -1139,8 +1139,8 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
-          children: const [
+        title: const Row(
+          children: [
             Icon(Icons.warning, color: Colors.red),
             SizedBox(width: 8),
             Text('Delete Product'),

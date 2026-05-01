@@ -103,6 +103,18 @@ class Product {
       tagsList = List<String>.from(json['tags'] as List);
     }
     
+    String? arModelUrl;
+    if (json['arModelUrl'] is String && (json['arModelUrl'] as String).isNotEmpty) {
+      arModelUrl = json['arModelUrl'] as String;
+    } else if (json['image_3d'] is String && (json['image_3d'] as String).isNotEmpty) {
+      arModelUrl = json['image_3d'] as String;
+    } else if (json['image_3d'] is List && (json['image_3d'] as List).isNotEmpty) {
+      final first3d = (json['image_3d'] as List).first;
+      if (first3d is String && first3d.isNotEmpty) {
+        arModelUrl = first3d;
+      }
+    }
+
     return Product(
       id: json['id'] as String,
       name: json['name'] as String,
@@ -113,7 +125,7 @@ class Product {
       material: json['material'] as String?,
       tags: tagsList,
       images: imagesList,
-      arModelUrl: json['arModelUrl'] as String?,
+      arModelUrl: arModelUrl,
       stock: (json['stock'] ?? json['stock_amount'] ?? 0) as int,
       soldAmount: json['sold_amount'] as int? ?? json['soldAmount'] as int? ?? 0,
       rating: (json['rating'] ?? json['reviews'] ?? 0.0) is num 

@@ -444,7 +444,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<NotificationType>(
-                  value: selectedType,
+                  initialValue: selectedType,
                   decoration: const InputDecoration(
                     labelText: 'Type',
                     border: OutlineInputBorder(),

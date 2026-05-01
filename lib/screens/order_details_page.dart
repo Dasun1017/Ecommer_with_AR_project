@@ -153,8 +153,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.red),
         ),
-        child: Row(
-          children: const [
+        child: const Row(
+          children: [
             Icon(Icons.cancel, color: Colors.red),
             SizedBox(width: 12),
             Text(
@@ -380,8 +380,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       0,
       (sum, item) => sum + item.totalPrice,
     );
-    final shipping = 0.0; // You can calculate shipping cost
-    final tax = 0.0; // You can calculate tax
+    const shipping = 0.0; // You can calculate shipping cost
+    const tax = 0.0; // You can calculate tax
 
     return Padding(
       padding: const EdgeInsets.all(16),

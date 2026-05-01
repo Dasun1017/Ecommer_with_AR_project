@@ -201,7 +201,7 @@ class _WishlistPageState extends State<WishlistPage> {
           padding: const EdgeInsets.all(12),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            childAspectRatio: 0.7,
+            childAspectRatio: 0.75,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
           ),
@@ -243,12 +243,12 @@ class _WishlistPageState extends State<WishlistPage> {
                         ? product.images[0]
                         : '',
                     width: double.infinity,
-                    height: 150,
+                    height: 120,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         width: double.infinity,
-                        height: 150,
+                        height: 120,
                         color: Colors.grey[300],
                         child: const Icon(Icons.image_not_supported, size: 50),
                       );

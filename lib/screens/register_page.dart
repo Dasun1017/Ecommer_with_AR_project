@@ -110,14 +110,14 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              const Color(0xFF0A1931),
-              const Color(0xFF185ADB),
-              const Color(0xFF1E3A8A),
+              Color(0xFF0A1931),
+              Color(0xFF185ADB),
+              Color(0xFF1E3A8A),
             ],
           ),
         ),
@@ -1055,26 +1055,26 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                         ),
                                         borderSide: BorderSide(color: Colors.orange.withOpacity(0.3)),
                                       ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: const BorderRadius.only(
+                                      focusedBorder: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.only(
                                           bottomLeft: Radius.circular(16),
                                           bottomRight: Radius.circular(16),
                                         ),
                                         borderSide: BorderSide(color: Colors.orange, width: 2),
                                       ),
-                                      errorBorder: OutlineInputBorder(
-                                        borderRadius: const BorderRadius.only(
+                                      errorBorder: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.only(
                                           bottomLeft: Radius.circular(16),
                                           bottomRight: Radius.circular(16),
                                         ),
-                                        borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+                                        borderSide: BorderSide(color: Colors.redAccent, width: 1.5),
                                       ),
-                                      focusedErrorBorder: OutlineInputBorder(
-                                        borderRadius: const BorderRadius.only(
+                                      focusedErrorBorder: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.only(
                                           bottomLeft: Radius.circular(16),
                                           bottomRight: Radius.circular(16),
                                         ),
-                                        borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+                                        borderSide: BorderSide(color: Colors.redAccent, width: 2),
                                       ),
                                       filled: true,
                                       fillColor: Colors.transparent,
@@ -1281,14 +1281,14 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Row(
+            content: const Row(
               children: [
-                const Icon(Icons.check_circle, color: Colors.white),
-                const SizedBox(width: 12),
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Successfully signed up with Google! Welcome!',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                     ),

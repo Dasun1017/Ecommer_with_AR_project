@@ -223,7 +223,7 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   DropdownButtonFormField<PaymentType>(
-                    value: selectedType,
+                    initialValue: selectedType,
                     decoration: const InputDecoration(
                       labelText: 'Payment Type',
                       border: OutlineInputBorder(),
