@@ -22,7 +22,7 @@ class RoleService {
       }
       
       final role = data['role'] as String?;
-      print('📋 RoleService: User data retrieved. Role field value: "${role}"');
+      print('📋 RoleService: User data retrieved. Role field value: "$role"');
       
       if (role == null) {
         print('⚠️ RoleService: Role field is null, defaulting to client');

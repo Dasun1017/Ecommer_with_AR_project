@@ -44,14 +44,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              const Color(0xFF0A1931),
-              const Color(0xFF185ADB),
-              const Color(0xFF1E3A8A),
+              Color(0xFF0A1931),
+              Color(0xFF185ADB),
+              Color(0xFF1E3A8A),
             ],
           ),
         ),

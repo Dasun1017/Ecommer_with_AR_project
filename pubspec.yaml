@@ -29,9 +29,10 @@ dependencies:
   cached_network_image: ^3.3.0
   shimmer: ^3.0.0
   
-  # AR Features (temporarily commented out - incompatible with AGP 8+)
-  # arcore_flutter_plugin: ^0.1.0
-  # ar_flutter_plugin: ^0.7.3
+  # AR Features
+  camera: ^0.10.5
+  flutter_3d_controller: ^2.3.0
+  google_mlkit_pose_detection: ^0.14.1
 
   # Utilities
   intl: ^0.18.1

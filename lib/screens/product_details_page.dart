@@ -4,6 +4,7 @@ import '../services/cart_service.dart';
 import '../services/auth_service.dart';
 import '../services/wishlist_service.dart';
 import '../models/cart_item_model.dart';
+import 'ar_tryon_page.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final Product product;
@@ -54,6 +55,35 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           _isInWishlist = isInWishlist;
         });
       }
+    }
+  }
+
+  Future<void> _goToARTryOn() async {
+    final userId = _authService.currentUser?.uid;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login first')),
+      );
+      return;
+    }
+
+    try {
+      final cartItems = await _cartService.getCartItems(userId).first;
+      if (context.mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ARTryOnPage(
+              product: widget.product,
+              cartItems: cartItems,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error opening AR: $e')),
+      );
     }
   }
 
@@ -130,13 +160,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             color: Colors.grey[200],
             borderRadius: BorderRadius.circular(20),
           ),
-          child: TextField(
+          child: const TextField(
             decoration: InputDecoration(
               hintText: 'Search any Product..',
               border: InputBorder.none,
-              prefixIcon: const Icon(Icons.search, size: 20),
-              suffixIcon: const Icon(Icons.mic, size: 20),
-              contentPadding: const EdgeInsets.symmetric(vertical: 12),
+              prefixIcon: Icon(Icons.search, size: 20),
+              suffixIcon: Icon(Icons.mic, size: 20),
+              contentPadding: EdgeInsets.symmetric(vertical: 12),
             ),
           ),
         ),
@@ -1162,11 +1192,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('AR View coming soon!')),
-                );
-              },
+              onPressed: _goToARTryOn,
             ),
           ),
         ],
