@@ -18,8 +18,8 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Manage Products'),
-        backgroundColor: Colors.blue[700],
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -61,12 +61,18 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                         const SizedBox(height: 16),
                         Text(
                           'Error loading products',
-                          style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           '${snapshot.error}',
-                          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -83,7 +89,9 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                         const SizedBox(height: 16),
                         Text(
                           'Loading products...',
-                          style: TextStyle(color: Colors.grey[600]),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -99,12 +107,18 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                         const SizedBox(height: 16),
                         Text(
                           'No products yet',
-                          style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Tap the + button to add your first product',
-                          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -134,14 +148,20 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                         const SizedBox(height: 16),
                         Text(
                           'No products found',
-                          style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           _searchQuery.isNotEmpty
                               ? 'Try adjusting your search'
                               : 'Add products to get started',
-                          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -193,7 +213,7 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                         width: 100,
                         height: 100,
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          color: Theme.of(context).colorScheme.surfaceVariant,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(Icons.image, size: 40),
@@ -242,14 +262,14 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.blue[50],
+                          color: Theme.of(context).colorScheme.primaryContainer,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           product.category,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.blue[700],
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -259,14 +279,18 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                         Row(
                           children: [
                             if (product.brand != null) ...[
-                              Icon(Icons.business, size: 12, color: Colors.grey[600]),
+                              Icon(
+                                Icons.business,
+                                size: 12,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
                               const SizedBox(width: 4),
                               Flexible(
                                 child: Text(
                                   product.brand!,
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: Colors.grey[700],
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
@@ -276,14 +300,18 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                             if (product.brand != null && product.material != null)
                               const SizedBox(width: 12),
                             if (product.material != null) ...[
-                              Icon(Icons.texture, size: 12, color: Colors.grey[600]),
+                              Icon(
+                                Icons.texture,
+                                size: 12,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
                               const SizedBox(width: 4),
                               Flexible(
                                 child: Text(
                                   product.material!,
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: Colors.grey[700],
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
@@ -753,7 +781,9 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                     createdAt: DateTime.now(),
                   );
 
-                  await docRef.set(product.toJson());
+                  final productData = product.toJson();
+                  productData.remove('image_3d');
+                  await docRef.set(productData);
 
                   if (context.mounted) {
                     Navigator.pop(context);
@@ -1097,7 +1127,6 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                     'description': descriptionController.text,
                     'images': imagesList,
                     'image_2d': imagesList,
-                    'image_3d': imagesList,
                     'arModelUrl': arModelUrlController.text.isNotEmpty ? arModelUrlController.text : null,
                     'colors': colorsList,
                     'color': colorsList,

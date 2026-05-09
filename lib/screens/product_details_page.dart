@@ -76,6 +76,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             builder: (context) => ARTryOnPage(
               product: widget.product,
               cartItems: cartItems,
+              selectedSize: _selectedSize,
             ),
           ),
         );

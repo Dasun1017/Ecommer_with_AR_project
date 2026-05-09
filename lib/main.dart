@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'auth_wrapper.dart';
 import 'utils/app_routes.dart';
 import 'utils/app_theme.dart';
+import 'utils/theme_controller.dart';
 import 'services/notification_service.dart';
 
 void main() async {
@@ -26,7 +27,10 @@ void main() async {
     // Add more admin emails as needed
   ]);
 
-  runApp(const MyApp());
+  final themeController = ThemeController.instance;
+  await themeController.load();
+
+  runApp(MyApp(themeController: themeController));
 }
 
 /// Setup admin users by email
@@ -74,18 +78,25 @@ Future<void> _setupAdminUsers(List<String> adminEmails) async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ThemeController themeController;
+
+  const MyApp({super.key, required this.themeController});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'AR Shopping',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      home: const AuthWrapper(),
-      onGenerateRoute: AppRoutes.generateRoute,
+    return AnimatedBuilder(
+      animation: themeController,
+      builder: (context, _) {
+        return MaterialApp(
+          title: 'AR Shopping',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeController.themeMode,
+          home: const AuthWrapper(),
+          onGenerateRoute: AppRoutes.generateRoute,
+        );
+      },
     );
   }
 }

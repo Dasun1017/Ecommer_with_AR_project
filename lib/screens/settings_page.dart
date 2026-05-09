@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../models/user_model.dart';
+import '../utils/theme_controller.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -11,13 +12,29 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final AuthService _authService = AuthService();
+  final ThemeController _themeController = ThemeController.instance;
   
   bool _pushNotifications = true;
   bool _emailNotifications = true;
   bool _smsNotifications = false;
   bool _orderUpdates = true;
   bool _promotions = false;
-  bool _darkMode = false;
+
+  final List<String> _countryOptions = [
+    'Pakistan',
+    'Sri Lanka',
+    'India',
+    'Bangladesh',
+    'Nepal',
+    'Maldives',
+    'United Arab Emirates',
+    'United Kingdom',
+    'United States',
+    'Canada',
+    'Australia',
+  ];
+
+  String _selectedCountry = 'Pakistan';
   
   UserModel? _user;
 
@@ -33,6 +50,9 @@ class _SettingsPageState extends State<SettingsPage> {
       final user = await _authService.getUserData(userId);
       setState(() {
         _user = user;
+        if (user?.country != null && user!.country!.trim().isNotEmpty) {
+          _selectedCountry = user.country!;
+        }
       });
     }
   }
@@ -107,15 +127,10 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildSwitchTile(
                 title: 'Dark Mode',
                 subtitle: 'Enable dark theme',
-                value: _darkMode,
-                onChanged: (value) {
-                  setState(() {
-                    _darkMode = value;
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Dark mode feature coming soon!'),
-                    ),
+                value: Theme.of(context).brightness == Brightness.dark,
+                onChanged: (value) async {
+                  await _themeController.setThemeMode(
+                    value ? ThemeMode.dark : ThemeMode.light,
                   );
                 },
               ),
@@ -136,11 +151,9 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildListTile(
                 icon: Icons.location_on,
                 title: 'Country/Region',
-                subtitle: 'Pakistan',
+                subtitle: _selectedCountry,
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Region settings coming soon!')),
-                  );
+                  _showCountryDialog();
                 },
               ),
               _buildListTile(
@@ -323,6 +336,83 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showCountryDialog() {
+    if (_user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login to update your country.')),
+      );
+      return;
+    }
+
+    String tempCountry = _selectedCountry;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Country'),
+        content: StatefulBuilder(
+          builder: (context, setDialogState) {
+            return SizedBox(
+              width: double.maxFinite,
+              child: ListView(
+                shrinkWrap: true,
+                children: _countryOptions.map((country) {
+                  return RadioListTile<String>(
+                    title: Text(country),
+                    value: country,
+                    groupValue: tempCountry,
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setDialogState(() {
+                        tempCountry = value;
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+            );
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                final updatedUser = _user!.copyWith(
+                  country: tempCountry,
+                  updatedAt: DateTime.now(),
+                );
+
+                await _authService.updateUserProfile(updatedUser);
+
+                if (context.mounted) {
+                  setState(() {
+                    _user = updatedUser;
+                    _selectedCountry = tempCountry;
+                  });
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Country updated successfully.')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e')),
+                  );
+                }
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
       ),
     );
   }
