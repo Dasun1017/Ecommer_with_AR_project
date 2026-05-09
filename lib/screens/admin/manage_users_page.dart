@@ -320,6 +320,8 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
               const SizedBox(height: 8),
               _buildDetailRow('Address', user.address ?? 'N/A'),
               const SizedBox(height: 8),
+              _buildDetailRow('Country', user.country ?? 'N/A'),
+              const SizedBox(height: 8),
               _buildDetailRow('Joined', _formatDate(user.createdAt)),
               const SizedBox(height: 8),
               _buildDetailRow('Last Updated', _formatDate(user.updatedAt)),

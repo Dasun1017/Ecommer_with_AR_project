@@ -6,6 +6,7 @@ class UserModel {
   final String? phoneNumber;
   final String? photoUrl;
   final String? address;
+  final String? country;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -17,6 +18,7 @@ class UserModel {
     this.phoneNumber,
     this.photoUrl,
     this.address,
+    this.country,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -30,6 +32,7 @@ class UserModel {
       phoneNumber: json['phoneNumber'] as String?,
       photoUrl: json['photoUrl'] as String?,
       address: json['address'] as String?,
+      country: json['country'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -44,6 +47,7 @@ class UserModel {
       'phoneNumber': phoneNumber,
       'photoUrl': photoUrl,
       'address': address,
+      'country': country,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -57,6 +61,7 @@ class UserModel {
     String? phoneNumber,
     String? photoUrl,
     String? address,
+    String? country,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -68,6 +73,7 @@ class UserModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       photoUrl: photoUrl ?? this.photoUrl,
       address: address ?? this.address,
+      country: country ?? this.country,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
