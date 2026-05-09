@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import '../services/order_service.dart';
 import '../services/cart_service.dart';
@@ -290,7 +292,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
+            color: Colors.grey.withValues(alpha: 0.3),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, -3),
@@ -378,30 +380,29 @@ ${_cityController.text}, ${_zipController.text}
         orderId,
         widget.total,
       );
-      
-      if (context.mounted) {
-        setState(() {
-          _isProcessing = false;
-        });
-        
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            title: const Text('Order Placed'),
-            content: const Text('Your order has been placed successfully!'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-      }
+
+      if (!context.mounted) return;
+      setState(() {
+        _isProcessing = false;
+      });
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Text('Order Placed'),
+          content: const Text('Your order has been placed successfully!'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
     } catch (e) {
       if (context.mounted) {
         setState(() {

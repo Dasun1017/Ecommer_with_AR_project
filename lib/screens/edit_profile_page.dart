@@ -44,6 +44,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (!mounted) return;
     
     if (image != null) {
       // In a real app, you'd upload to Firebase Storage and get the URL

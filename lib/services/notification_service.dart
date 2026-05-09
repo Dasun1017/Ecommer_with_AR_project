@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../models/notification_model.dart';
@@ -16,11 +18,11 @@ class NotificationService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
+      developer.log('User granted permission');
       
       // Get FCM token
       String? token = await _messaging.getToken();
-      print('FCM Token: $token');
+      developer.log('FCM Token: $token');
       
       // Listen to foreground messages
       FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
@@ -32,13 +34,13 @@ class NotificationService {
 
   // Handle foreground message
   void _handleForegroundMessage(RemoteMessage message) {
-    print('Received foreground message: ${message.notification?.title}');
+    developer.log('Received foreground message: ${message.notification?.title}');
     // Show local notification or update UI
   }
 
   // Handle background message
   void _handleBackgroundMessage(RemoteMessage message) {
-    print('Opened app from background message: ${message.notification?.title}');
+    developer.log('Opened app from background message: ${message.notification?.title}');
     // Navigate to specific screen based on message data
   }
 

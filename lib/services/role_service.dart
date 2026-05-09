@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RoleService {
@@ -7,34 +9,34 @@ class RoleService {
   /// Returns 'client' by default if role is not found or on error
   Future<String> getUserRole(String userId) async {
     try {
-      print('🔍 RoleService: Fetching role for user: $userId');
+      developer.log('🔍 RoleService: Fetching role for user: $userId');
       final doc = await _firestore.collection('users').doc(userId).get();
       
       if (!doc.exists) {
-        print('⚠️ RoleService: User document does not exist for ID: $userId');
+        developer.log('⚠️ RoleService: User document does not exist for ID: $userId');
         return 'client';
       }
       
       final data = doc.data();
       if (data == null) {
-        print('⚠️ RoleService: User document exists but data is null');
+        developer.log('⚠️ RoleService: User document exists but data is null');
         return 'client';
       }
       
       final role = data['role'] as String?;
-      print('📋 RoleService: User data retrieved. Role field value: "$role"');
+      developer.log('📋 RoleService: User data retrieved. Role field value: "$role"');
       
       if (role == null) {
-        print('⚠️ RoleService: Role field is null, defaulting to client');
+        developer.log('⚠️ RoleService: Role field is null, defaulting to client');
         return 'client';
       }
       
       final normalizedRole = role.toLowerCase().trim();
-      print('✅ RoleService: Returning role: "$normalizedRole"');
+      developer.log('✅ RoleService: Returning role: "$normalizedRole"');
       return normalizedRole;
       
     } catch (e) {
-      print('❌ RoleService Error getting user role: $e');
+      developer.log('❌ RoleService Error getting user role: $e');
       return 'client'; // Default to client on error
     }
   }
@@ -73,7 +75,7 @@ class RoleService {
   /// Call this from main.dart or a debug page
   Future<void> setUserAsAdmin(String userId, {String? email, String? name}) async {
     try {
-      print('🔧 Setting user as admin: $userId');
+      developer.log('🔧 Setting user as admin: $userId');
       
       // Check if user document exists
       final docRef = _firestore.collection('users').doc(userId);
@@ -89,23 +91,23 @@ class RoleService {
           'createdAt': DateTime.now().toIso8601String(),
           'updatedAt': DateTime.now().toIso8601String(),
         });
-        print('✅ Created new admin user document');
+        developer.log('✅ Created new admin user document');
       } else {
         // Update existing user document to admin role
         await docRef.update({
           'role': 'admin',
           'updatedAt': DateTime.now().toIso8601String(),
         });
-        print('✅ Updated existing user to admin role');
+        developer.log('✅ Updated existing user to admin role');
       }
       
       // Verify the role was set
       final verifyDoc = await docRef.get();
       final role = verifyDoc.data()?['role'];
-      print('✅ Verified: User role is now "$role"');
+      developer.log('✅ Verified: User role is now "$role"');
       
     } catch (e) {
-      print('❌ Error setting user as admin: $e');
+      developer.log('❌ Error setting user as admin: $e');
       throw Exception('Failed to set user as admin: $e');
     }
   }
@@ -123,10 +125,10 @@ class RoleService {
           'role': 'admin',
           'updatedAt': DateTime.now().toIso8601String(),
         });
-        print('✅ Set ${doc.data()['email']} as admin');
+        developer.log('✅ Set ${doc.data()['email']} as admin');
       }
     } catch (e) {
-      print('❌ Error setting users as admin: $e');
+      developer.log('❌ Error setting users as admin: $e');
       throw Exception('Failed to set users as admin: $e');
     }
   }

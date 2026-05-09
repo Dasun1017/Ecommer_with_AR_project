@@ -4,8 +4,17 @@ import '../models/product_model.dart';
 
 class ProductsPage extends StatefulWidget {
   final String? category;
+  final String? searchQuery;
+  final String? sortBy;
+  final String? filter;
 
-  const ProductsPage({super.key, this.category});
+  const ProductsPage({
+    super.key,
+    this.category,
+    this.searchQuery,
+    this.sortBy,
+    this.filter,
+  });
 
   @override
   State<ProductsPage> createState() => _ProductsPageState();
@@ -19,7 +28,7 @@ class _ProductsPageState extends State<ProductsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.category ?? 'All Products'),
+        title: Text(_buildTitle()),
         actions: [
           IconButton(
             icon: Icon(_isGridView ? Icons.list : Icons.grid_view),
@@ -32,8 +41,8 @@ class _ProductsPageState extends State<ProductsPage> {
         ],
       ),
       body: StreamBuilder<List<Product>>(
-        stream: widget.category != null
-            ? _productService.getProductsByCategory(widget.category!)
+        stream: widget.category != null && widget.category!.trim().isNotEmpty
+            ? _productService.getProductsByCategory(widget.category!.trim())
             : _productService.getAllProducts(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -44,11 +53,19 @@ class _ProductsPageState extends State<ProductsPage> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final products = snapshot.data!;
+          var products = List<Product>.from(snapshot.data!);
+          products = _applySearchFilter(products);
+          products = _applyFilter(products);
+          products = _applySort(products);
 
           if (products.isEmpty) {
-            return const Center(
-              child: Text('No products found'),
+            final query = widget.searchQuery?.trim();
+            return Center(
+              child: Text(
+                query != null && query.isNotEmpty
+                    ? 'No products found for "$query"'
+                    : 'No products found',
+              ),
             );
           }
 
@@ -58,6 +75,83 @@ class _ProductsPageState extends State<ProductsPage> {
         },
       ),
     );
+  }
+
+  String _buildTitle() {
+    final query = widget.searchQuery?.trim();
+    if (query != null && query.isNotEmpty) {
+      return 'Search: $query';
+    }
+    if (widget.category != null && widget.category!.trim().isNotEmpty) {
+      return widget.category!.trim();
+    }
+    return 'All Products';
+  }
+
+  List<Product> _applySearchFilter(List<Product> products) {
+    final query = widget.searchQuery?.trim().toLowerCase();
+    if (query == null || query.isEmpty) return products;
+
+    return products.where((product) {
+      final fields = [
+        product.name,
+        product.description,
+        product.category,
+        product.brand ?? '',
+        product.material ?? '',
+        product.tags.join(' '),
+        product.colors.join(' '),
+        product.sizes.join(' '),
+      ];
+
+      return fields.any((value) => value.toLowerCase().contains(query));
+    }).toList();
+  }
+
+  List<Product> _applyFilter(List<Product> products) {
+    final filter = widget.filter?.trim().toLowerCase();
+    if (filter == null || filter.isEmpty) return products;
+
+    switch (filter) {
+      case 'deals':
+        return products.where((p) => p.rating >= 4.0).toList();
+      case 'availability':
+        return products.where((p) => p.stock > 0).toList();
+      case 'rating':
+        return products.where((p) => p.rating >= 4.0).toList();
+      default:
+        return products;
+    }
+  }
+
+  List<Product> _applySort(List<Product> products) {
+    final sortBy = widget.sortBy?.trim();
+    if (sortBy == null || sortBy.isEmpty) return products;
+
+    switch (sortBy) {
+      case 'Popularity':
+      case 'popularity':
+        products.sort((a, b) => b.soldAmount.compareTo(a.soldAmount));
+        break;
+      case 'Price: Low to High':
+      case 'price_low':
+        products.sort((a, b) => a.price.compareTo(b.price));
+        break;
+      case 'Price: High to Low':
+      case 'price_high':
+        products.sort((a, b) => b.price.compareTo(a.price));
+        break;
+      case 'Newest First':
+      case 'newest':
+        products.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        break;
+      case 'Rating':
+      case 'rating':
+        products.sort((a, b) => b.rating.compareTo(a.rating));
+        break;
+    }
+
+    return products;
   }
 
   Widget _buildGridView(List<Product> products) {

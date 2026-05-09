@@ -37,7 +37,7 @@ void main() async {
 Future<void> _setupAdminUsers(List<String> adminEmails) async {
   if (adminEmails.isEmpty || adminEmails.first == 'your.admin@email.com') {
     // Skip if no emails configured
-    print('⚠️ No admin emails configured. Update main.dart to set admin users.');
+    debugPrint('⚠️ No admin emails configured. Update main.dart to set admin users.');
     return;
   }
 
@@ -64,16 +64,16 @@ Future<void> _setupAdminUsers(List<String> adminEmails) async {
             'role': 'admin',
             'updatedAt': DateTime.now().toIso8601String(),
           });
-          print('✅ Set $email as admin');
+          debugPrint('✅ Set $email as admin');
         } else {
-          print('ℹ️ $email is already an admin');
+          debugPrint('ℹ️ $email is already an admin');
         }
       } else {
-        print('⚠️ User not found: $email (they need to register first)');
+        debugPrint('⚠️ User not found: $email (they need to register first)');
       }
     }
   } catch (e) {
-    print('❌ Error setting up admin users: $e');
+    debugPrint('❌ Error setting up admin users: $e');
   }
 }
 

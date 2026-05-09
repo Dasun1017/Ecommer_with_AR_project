@@ -14,16 +14,16 @@ class _GetStartedPageState extends State<GetStartedPage> {
 
   /// Mark onboarding as completed and navigate to home page
   Future<void> _completeOnboarding() async {
-    print('═══════════════════════════════════════');
-    print('✅ GetStartedPage: Completing onboarding');
+    debugPrint('═══════════════════════════════════════');
+    debugPrint('✅ GetStartedPage: Completing onboarding');
     
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasSeenOnboarding', true);
     
     // Verify it was saved
     final saved = prefs.getBool('hasSeenOnboarding') ?? false;
-    print('   Flag saved successfully: $saved');
-    print('═══════════════════════════════════════');
+    debugPrint('   Flag saved successfully: $saved');
+    debugPrint('═══════════════════════════════════════');
     
     if (mounted) {
       // Navigate to home page by removing all previous routes

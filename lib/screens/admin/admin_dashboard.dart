@@ -80,7 +80,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           Container(
             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.white.withOpacity(0.3)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
               borderRadius: BorderRadius.circular(8),
             ),
             child: IconButton(

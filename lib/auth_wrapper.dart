@@ -48,11 +48,11 @@ class _AuthWrapperState extends State<AuthWrapper> {
     final prefs = await SharedPreferences.getInstance();
     final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
     
-    print('═══════════════════════════════════════');
-    print('🔍 AuthWrapper: Checking first launch');
-    print('   hasSeenOnboarding flag: $hasSeenOnboarding');
-    print('   Will show GetStarted: ${!hasSeenOnboarding}');
-    print('═══════════════════════════════════════');
+    debugPrint('═══════════════════════════════════════');
+    debugPrint('🔍 AuthWrapper: Checking first launch');
+    debugPrint('   hasSeenOnboarding flag: $hasSeenOnboarding');
+    debugPrint('   Will show GetStarted: ${!hasSeenOnboarding}');
+    debugPrint('═══════════════════════════════════════');
     
     setState(() {
       // Only show GetStarted page if user has never seen onboarding
@@ -101,11 +101,11 @@ class _AuthWrapperState extends State<AuthWrapper> {
         final userId = snapshot.data!.uid;
         final userEmail = snapshot.data!.email ?? 'Unknown';
         
-        print('═══════════════════════════════════════');
-        print('🔐 AuthWrapper: User logged in');
-        print('   User ID: $userId');
-        print('   Email: $userEmail');
-        print('═══════════════════════════════════════');
+        debugPrint('═══════════════════════════════════════');
+        debugPrint('🔐 AuthWrapper: User logged in');
+        debugPrint('   User ID: $userId');
+        debugPrint('   Email: $userEmail');
+        debugPrint('═══════════════════════════════════════');
         
         return FutureBuilder<String>(
           future: RoleService().getUserRole(userId),
@@ -128,7 +128,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
             // Show error if role check failed
             if (roleSnapshot.hasError) {
-              print('❌ AuthWrapper Error: ${roleSnapshot.error}');
+              debugPrint('❌ AuthWrapper Error: ${roleSnapshot.error}');
               return Scaffold(
                 body: Center(
                   child: Column(
@@ -161,18 +161,18 @@ class _AuthWrapperState extends State<AuthWrapper> {
             // 🔀 SEPARATION POINT - Route based on role
             final role = (roleSnapshot.data ?? 'client').toLowerCase().trim();
             
-            print('═══════════════════════════════════════');
-            print('👤 AuthWrapper: Role detected = "$role"');
-            print('═══════════════════════════════════════');
+            debugPrint('═══════════════════════════════════════');
+            debugPrint('👤 AuthWrapper: Role detected = "$role"');
+            debugPrint('═══════════════════════════════════════');
             
             // Route based on role with explicit comparison
             if (role == 'admin') {
-              print('✅ Routing to ADMIN Dashboard');
-              print('═══════════════════════════════════════\n');
+              debugPrint('✅ Routing to ADMIN Dashboard');
+              debugPrint('═══════════════════════════════════════\n');
               return const AdminDashboard();
             } else {
-              print('✅ Routing to CLIENT Home Page');
-              print('═══════════════════════════════════════\n');
+              debugPrint('✅ Routing to CLIENT Home Page');
+              debugPrint('═══════════════════════════════════════\n');
               return const HomePage();
             }
           },

@@ -390,12 +390,19 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
     _lastShoulderPct = pct;
 
     final String rec;
-    if (pct < 0.18)      rec = 'XS';
-    else if (pct < 0.22) rec = 'S';
-    else if (pct < 0.27) rec = 'M';
-    else if (pct < 0.33) rec = 'L';
-    else if (pct < 0.40) rec = 'XL';
-    else                  rec = 'XXL';
+    if (pct < 0.18) {
+      rec = 'XS';
+    } else if (pct < 0.22) {
+      rec = 'S';
+    } else if (pct < 0.27) {
+      rec = 'M';
+    } else if (pct < 0.33) {
+      rec = 'L';
+    } else if (pct < 0.40) {
+      rec = 'XL';
+    } else {
+      rec = 'XXL';
+    }
 
     if (rec != _measuredSizeRecommendation) {
       setState(() => _measuredSizeRecommendation = rec);
@@ -1028,12 +1035,12 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
         color: Colors.green.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Row(
+      child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.person, color: Colors.white, size: 14),
-          const SizedBox(width: 6),
-          const Text('Body Detected', style: TextStyle(color: Colors.white, fontSize: 12)),
+          Icon(Icons.person, color: Colors.white, size: 14),
+          SizedBox(width: 6),
+          Text('Body Detected', style: TextStyle(color: Colors.white, fontSize: 12)),
         ],
       ),
     );

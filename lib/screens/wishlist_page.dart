@@ -53,10 +53,12 @@ class _WishlistPageState extends State<WishlistPage> {
     if (userId != null) {
       try {
         await _wishlistService.removeFromWishlist(userId, productId);
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Removed from wishlist')),
         );
       } catch (e) {
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
         );
@@ -118,10 +120,12 @@ class _WishlistPageState extends State<WishlistPage> {
                 if (userId != null) {
                   try {
                     await _wishlistService.clearWishlist(userId);
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Wishlist cleared')),
                     );
                   } catch (e) {
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Error: $e')),
                     );
