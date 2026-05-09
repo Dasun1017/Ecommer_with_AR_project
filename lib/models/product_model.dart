@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 class Product {
   final String id;
   final String name;
@@ -52,12 +54,12 @@ class Product {
         if (json['image_2d'] is List) {
           // image_2d is an array
           List<String> images2d = List<String>.from(json['image_2d'] as List);
-          print('Loading image_2d array: ${images2d.length} images');
+          developer.log('Loading image_2d array: ${images2d.length} images');
           imagesList.addAll(images2d);
         } else if (json['image_2d'] is String && (json['image_2d'] as String).isNotEmpty) {
           // image_2d is a single string
           String imageUrl = json['image_2d'] as String;
-          print('Loading image_2d: $imageUrl');
+          developer.log('Loading image_2d: $imageUrl');
           imagesList.add(imageUrl);
         }
       }
@@ -66,12 +68,12 @@ class Product {
         if (json['image_3d'] is List) {
           // image_3d is an array
           List<String> images3d = List<String>.from(json['image_3d'] as List);
-          print('Loading image_3d array: ${images3d.length} images');
+          developer.log('Loading image_3d array: ${images3d.length} images');
           imagesList.addAll(images3d);
         } else if (json['image_3d'] is String && (json['image_3d'] as String).isNotEmpty) {
           // image_3d is a single string
           String imageUrl = json['image_3d'] as String;
-          print('Loading image_3d: $imageUrl');
+          developer.log('Loading image_3d: $imageUrl');
           imagesList.add(imageUrl);
         }
       }

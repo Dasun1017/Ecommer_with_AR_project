@@ -117,11 +117,10 @@ class _NotificationPageState extends State<NotificationPage> {
       ),
       onDismissed: (direction) async {
         await _notificationService.deleteNotification(notification.id);
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Notification deleted')),
-          );
-        }
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Notification deleted')),
+        );
       },
       child: InkWell(
         onTap: () async {
@@ -234,45 +233,42 @@ class _NotificationPageState extends State<NotificationPage> {
           final orderId = notification.data!['orderId'];
           
           // Show loading indicator
-          if (context.mounted) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) => const Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
+          if (!context.mounted) return;
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
           
           try {
             // Fetch the order details
             final order = await _orderService.getOrderById(orderId);
             
-            if (context.mounted) {
-              // Close loading dialog
-              Navigator.pop(context);
-              
-              if (order != null) {
-                // Navigate to order details page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => OrderDetailsPage(order: order),
-                  ),
-                );
-              } else {
-                // Order not found - navigate to orders page instead
-                _showOrderNotFoundDialog();
-              }
-            }
-          } catch (e) {
-            if (context.mounted) {
-              // Close loading dialog
-              Navigator.pop(context);
-              
-              // Show helpful error dialog
+            if (!context.mounted) return;
+            // Close loading dialog
+            Navigator.pop(context);
+
+            if (order != null) {
+              // Navigate to order details page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => OrderDetailsPage(order: order),
+                ),
+              );
+            } else {
+              // Order not found - navigate to orders page instead
               _showOrderNotFoundDialog();
             }
+          } catch (e) {
+            if (!context.mounted) return;
+            // Close loading dialog
+            Navigator.pop(context);
+
+            // Show helpful error dialog
+            _showOrderNotFoundDialog();
           }
         } else {
           Navigator.push(

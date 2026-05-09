@@ -140,7 +140,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                         decoration: BoxDecoration(
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                               blurRadius: 20,
                               spreadRadius: 2,
                               offset: const Offset(0, 4),
@@ -170,7 +170,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                         'Join us for an amazing AR shopping experience',
                         style: TextStyle(
                           fontSize: 15,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           height: 1.4,
                         ),
                         textAlign: TextAlign.center,
@@ -184,7 +184,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                               blurRadius: 20,
                               offset: const Offset(0, 8),
                             ),
@@ -217,12 +217,12 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                         height: 58,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white.withOpacity(0.3), width: 1.5),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
                         ),
                         child: ElevatedButton.icon(
                           onPressed: _isLoading ? null : _signUpWithGoogle,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white.withOpacity(0.1),
+                            backgroundColor: Colors.white.withValues(alpha: 0.1),
                             foregroundColor: Colors.white,
                             shadowColor: Colors.transparent,
                             shape: RoundedRectangleBorder(
@@ -255,7 +255,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                           Text(
                             'Already have an account? ',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                               fontSize: 15,
                             ),
                           ),
@@ -298,7 +298,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                 size: 24,
               ),
               style: IconButton.styleFrom(
-                backgroundColor: Colors.white.withOpacity(0.1),
+                backgroundColor: Colors.white.withValues(alpha: 0.1),
                 padding: const EdgeInsets.all(12),
               ),
             ),
@@ -336,17 +336,17 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                     colors: [
                       const Color(0xFF0A1931),
                       const Color(0xFF0F2847),
-                      const Color(0xFF1E3A8A).withOpacity(0.95),
+                      const Color(0xFF1E3A8A).withValues(alpha: 0.95),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     width: 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF185ADB).withOpacity(0.3),
+                      color: const Color(0xFF185ADB).withValues(alpha: 0.3),
                       blurRadius: 40,
                       spreadRadius: 0,
                       offset: const Offset(0, 20),
@@ -383,14 +383,14 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                   'Join us today',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Colors.white.withOpacity(0.7),
+                                    color: Colors.white.withValues(alpha: 0.7),
                                   ),
                                 ),
                               ],
                             ),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: IconButton(
@@ -411,7 +411,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -423,32 +423,32 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             decoration: InputDecoration(
                               labelText: 'Full Name',
                               labelStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
                               hintText: 'John Doe',
-                              hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+                              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35)),
                               prefixIcon: Container(
                                 margin: const EdgeInsets.all(12),
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.1),
+                                  color: Colors.white.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Icon(
                                   Icons.person_outlined,
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   size: 20,
                                 ),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -463,7 +463,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                 borderSide: const BorderSide(color: Colors.redAccent, width: 2),
                               ),
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.08),
+                              fillColor: Colors.white.withValues(alpha: 0.08),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                             ),
                             validator: (value) {
@@ -481,7 +481,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -493,32 +493,32 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             decoration: InputDecoration(
                               labelText: 'Email Address',
                               labelStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
                               hintText: 'you@example.com',
-                              hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+                              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35)),
                               prefixIcon: Container(
                                 margin: const EdgeInsets.all(12),
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.1),
+                                  color: Colors.white.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Icon(
                                   Icons.email_outlined,
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   size: 20,
                                 ),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -533,7 +533,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                 borderSide: const BorderSide(color: Colors.redAccent, width: 2),
                               ),
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.08),
+                              fillColor: Colors.white.withValues(alpha: 0.08),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                             ),
                             keyboardType: TextInputType.emailAddress,
@@ -555,7 +555,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -575,32 +575,32 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             decoration: InputDecoration(
                               labelText: 'Password',
                               labelStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
                               hintText: '••••••••',
-                              hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+                              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35)),
                               prefixIcon: Container(
                                 margin: const EdgeInsets.all(12),
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.1),
+                                  color: Colors.white.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Icon(
                                   Icons.lock_outlined,
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   size: 20,
                                 ),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -615,14 +615,14 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                 borderSide: const BorderSide(color: Colors.redAccent, width: 2),
                               ),
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.08),
+                              fillColor: Colors.white.withValues(alpha: 0.08),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _obscurePassword
                                       ? Icons.visibility_outlined
                                       : Icons.visibility_off_outlined,
-                                  color: Colors.white.withOpacity(0.7),
+                                  color: Colors.white.withValues(alpha: 0.7),
                                   size: 22,
                                 ),
                                 onPressed: () {
@@ -660,7 +660,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                             height: 6,
                                             decoration: BoxDecoration(
                                               borderRadius: BorderRadius.circular(3),
-                                              color: Colors.white.withOpacity(0.1),
+                                              color: Colors.white.withValues(alpha: 0.1),
                                             ),
                                             child: FractionallySizedBox(
                                               alignment: Alignment.centerLeft,
@@ -671,12 +671,12 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                                   gradient: LinearGradient(
                                                     colors: [
                                                       passwordStrengthColor,
-                                                      passwordStrengthColor.withOpacity(0.7),
+                                                      passwordStrengthColor.withValues(alpha: 0.7),
                                                     ],
                                                   ),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color: passwordStrengthColor.withOpacity(0.5),
+                                                      color: passwordStrengthColor.withValues(alpha: 0.5),
                                                       blurRadius: 8,
                                                       spreadRadius: 1,
                                                     ),
@@ -690,10 +690,10 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                           decoration: BoxDecoration(
-                                            color: passwordStrengthColor.withOpacity(0.15),
+                                            color: passwordStrengthColor.withValues(alpha: 0.15),
                                             borderRadius: BorderRadius.circular(8),
                                             border: Border.all(
-                                              color: passwordStrengthColor.withOpacity(0.3),
+                                              color: passwordStrengthColor.withValues(alpha: 0.3),
                                               width: 1,
                                             ),
                                           ),
@@ -721,7 +721,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -733,32 +733,32 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             decoration: InputDecoration(
                               labelText: 'Confirm Password',
                               labelStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
                               hintText: '••••••••',
-                              hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+                              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35)),
                               prefixIcon: Container(
                                 margin: const EdgeInsets.all(12),
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.1),
+                                  color: Colors.white.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Icon(
                                   Icons.lock_outline_rounded,
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   size: 20,
                                 ),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -773,14 +773,14 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                 borderSide: const BorderSide(color: Colors.redAccent, width: 2),
                               ),
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.08),
+                              fillColor: Colors.white.withValues(alpha: 0.08),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _obscureConfirmPassword
                                       ? Icons.visibility_outlined
                                       : Icons.visibility_off_outlined,
-                                  color: Colors.white.withOpacity(0.7),
+                                  color: Colors.white.withValues(alpha: 0.7),
                                   size: 22,
                                 ),
                                 onPressed: () {
@@ -810,7 +810,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             Text(
                               'Account Type',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 0.5,
@@ -841,18 +841,18 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                             : null,
                                         color: _selectedRole == 'client'
                                             ? null
-                                            : Colors.white.withOpacity(0.08),
+                                            : Colors.white.withValues(alpha: 0.08),
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
                                           color: _selectedRole == 'client'
                                               ? Colors.blue[300]!
-                                              : Colors.white.withOpacity(0.2),
+                                              : Colors.white.withValues(alpha: 0.2),
                                           width: _selectedRole == 'client' ? 2 : 1.5,
                                         ),
                                         boxShadow: _selectedRole == 'client'
                                             ? [
                                                 BoxShadow(
-                                                  color: Colors.blue.withOpacity(0.4),
+                                                  color: Colors.blue.withValues(alpha: 0.4),
                                                   blurRadius: 12,
                                                   offset: const Offset(0, 4),
                                                 ),
@@ -866,7 +866,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                             Icons.person_outline_rounded,
                                             color: _selectedRole == 'client'
                                                 ? Colors.white
-                                                : Colors.white.withOpacity(0.6),
+                                                : Colors.white.withValues(alpha: 0.6),
                                             size: 28,
                                           ),
                                           const SizedBox(height: 6),
@@ -875,7 +875,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                             style: TextStyle(
                                               color: _selectedRole == 'client'
                                                   ? Colors.white
-                                                  : Colors.white.withOpacity(0.6),
+                                                  : Colors.white.withValues(alpha: 0.6),
                                               fontSize: 14,
                                               fontWeight: _selectedRole == 'client'
                                                   ? FontWeight.bold
@@ -909,18 +909,18 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                             : null,
                                         color: _selectedRole == 'admin'
                                             ? null
-                                            : Colors.white.withOpacity(0.08),
+                                            : Colors.white.withValues(alpha: 0.08),
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
                                           color: _selectedRole == 'admin'
                                               ? Colors.orange[300]!
-                                              : Colors.white.withOpacity(0.2),
+                                              : Colors.white.withValues(alpha: 0.2),
                                           width: _selectedRole == 'admin' ? 2 : 1.5,
                                         ),
                                         boxShadow: _selectedRole == 'admin'
                                             ? [
                                                 BoxShadow(
-                                                  color: Colors.orange.withOpacity(0.4),
+                                                  color: Colors.orange.withValues(alpha: 0.4),
                                                   blurRadius: 12,
                                                   offset: const Offset(0, 4),
                                                 ),
@@ -934,7 +934,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                             Icons.admin_panel_settings_rounded,
                                             color: _selectedRole == 'admin'
                                                 ? Colors.white
-                                                : Colors.white.withOpacity(0.6),
+                                                : Colors.white.withValues(alpha: 0.6),
                                             size: 28,
                                           ),
                                           const SizedBox(height: 6),
@@ -943,7 +943,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                             style: TextStyle(
                                               color: _selectedRole == 'admin'
                                                   ? Colors.white
-                                                  : Colors.white.withOpacity(0.6),
+                                                  : Colors.white.withValues(alpha: 0.6),
                                               fontSize: 14,
                                               fontWeight: _selectedRole == 'admin'
                                                   ? FontWeight.bold
@@ -967,7 +967,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.orange.withOpacity(0.2),
+                                  color: Colors.orange.withValues(alpha: 0.2),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),
                                 ),
@@ -979,7 +979,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: Colors.orange.withOpacity(0.15),
+                                    color: Colors.orange.withValues(alpha: 0.15),
                                     borderRadius: const BorderRadius.only(
                                       topLeft: Radius.circular(16),
                                       topRight: Radius.circular(16),
@@ -1006,7 +1006,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                 ),
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.08),
+                                    color: Colors.white.withValues(alpha: 0.08),
                                     borderRadius: const BorderRadius.only(
                                       bottomLeft: Radius.circular(16),
                                       bottomRight: Radius.circular(16),
@@ -1022,17 +1022,17 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                     decoration: InputDecoration(
                                       labelText: 'Admin Access Code',
                                       labelStyle: TextStyle(
-                                        color: Colors.white.withOpacity(0.8),
+                                        color: Colors.white.withValues(alpha: 0.8),
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                       ),
                                       hintText: 'Enter admin code',
-                                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+                                      hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35)),
                                       prefixIcon: Container(
                                         margin: const EdgeInsets.all(12),
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: Colors.orange.withOpacity(0.2),
+                                          color: Colors.orange.withValues(alpha: 0.2),
                                           borderRadius: BorderRadius.circular(10),
                                         ),
                                         child: Icon(
@@ -1046,14 +1046,14 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                           bottomLeft: Radius.circular(16),
                                           bottomRight: Radius.circular(16),
                                         ),
-                                        borderSide: BorderSide(color: Colors.orange.withOpacity(0.3)),
+                                        borderSide: BorderSide(color: Colors.orange.withValues(alpha: 0.3)),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: const BorderRadius.only(
                                           bottomLeft: Radius.circular(16),
                                           bottomRight: Radius.circular(16),
                                         ),
-                                        borderSide: BorderSide(color: Colors.orange.withOpacity(0.3)),
+                                        borderSide: BorderSide(color: Colors.orange.withValues(alpha: 0.3)),
                                       ),
                                       focusedBorder: const OutlineInputBorder(
                                         borderRadius: BorderRadius.only(
@@ -1111,13 +1111,13 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.white.withOpacity(0.4),
+                                color: Colors.white.withValues(alpha: 0.4),
                                 blurRadius: 25,
                                 spreadRadius: 1,
                                 offset: const Offset(0, 8),
                               ),
                               BoxShadow(
-                                color: const Color(0xFF185ADB).withOpacity(0.3),
+                                color: const Color(0xFF185ADB).withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 spreadRadius: -5,
                                 offset: const Offset(0, 10),
@@ -1196,48 +1196,45 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
         await NotificationHelper.sendWelcomeNotification(userId);
       }
 
-      if (context.mounted) {
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.white),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    _selectedRole == 'admin'
-                        ? 'Admin account created successfully! Welcome!'
-                        : 'Account created successfully! Welcome to Tryverse!',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
+      if (!context.mounted) return;
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  _selectedRole == 'admin'
+                      ? 'Admin account created successfully! Welcome!'
+                      : 'Account created successfully! Welcome to Tryverse!',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
-            ),
-            backgroundColor: _selectedRole == 'admin' ? Colors.orange[700] : Colors.green,
-            duration: const Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            margin: const EdgeInsets.all(16),
+              ),
+            ],
           ),
-        );
-        
-        // Small delay to ensure auth state is fully updated and show message
-        await Future.delayed(const Duration(milliseconds: 500));
-        
-        if (context.mounted) {
-          // Force complete navigation reset to trigger AuthWrapper rebuild
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const AuthWrapper()),
-            (route) => false,
-          );
-        }
-      }
+          backgroundColor: _selectedRole == 'admin' ? Colors.orange[700] : Colors.green,
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+
+      // Small delay to ensure auth state is fully updated and show message
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (!context.mounted) return;
+      // Force complete navigation reset to trigger AuthWrapper rebuild
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AuthWrapper()),
+        (route) => false,
+      );
     } catch (e) {
       if (context.mounted) {
         // Extract the actual error message
@@ -1277,46 +1274,43 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
         await NotificationHelper.sendWelcomeNotification(userId);
       }
 
-      if (context.mounted) {
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Successfully signed up with Google! Welcome!',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
+      if (!context.mounted) return;
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Successfully signed up with Google! Welcome!',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            margin: const EdgeInsets.all(16),
+              ),
+            ],
           ),
-        );
-        
-        // Small delay to ensure auth state is fully updated and show message
-        await Future.delayed(const Duration(milliseconds: 500));
-        
-        if (context.mounted) {
-          // Force complete navigation reset to trigger AuthWrapper rebuild
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const AuthWrapper()),
-            (route) => false,
-          );
-        }
-      }
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+
+      // Small delay to ensure auth state is fully updated and show message
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (!context.mounted) return;
+      // Force complete navigation reset to trigger AuthWrapper rebuild
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AuthWrapper()),
+        (route) => false,
+      );
     } catch (e) {
       if (context.mounted) {
         // Extract the actual error message

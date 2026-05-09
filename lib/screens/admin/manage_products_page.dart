@@ -213,7 +213,7 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                         width: 100,
                         height: 100,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(Icons.image, size: 40),

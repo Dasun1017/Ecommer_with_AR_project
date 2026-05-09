@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/user_model.dart';
@@ -191,8 +193,8 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
                         ),
                         decoration: BoxDecoration(
                           color: isAdmin
-                              ? Colors.orange.withOpacity(0.2)
-                              : Colors.blue.withOpacity(0.2),
+                              ? Colors.orange.withValues(alpha: 0.2)
+                              : Colors.blue.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: isAdmin ? Colors.orange : Colors.blue,

@@ -91,6 +91,9 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (_) => ProductsPage(
             category: args?['category'] as String?,
+            searchQuery: args?['searchQuery'] as String?,
+            sortBy: args?['sortBy'] as String?,
+            filter: args?['filter'] as String?,
           ),
         );
       

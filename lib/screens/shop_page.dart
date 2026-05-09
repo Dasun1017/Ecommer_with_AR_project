@@ -20,8 +20,10 @@ class _ShopPageState extends State<ShopPage> {
   final AuthService _authService = AuthService();
   final CartService _cartService = CartService();
   final NotificationService _notificationService = NotificationService();
+  final TextEditingController _searchController = TextEditingController();
   String? _selectedCategory;
   String _sortBy = 'newest';
+  String _searchQuery = '';
   int _selectedIndex = 1;
   bool _isCategorySidebarExpanded = false;
   List<String> _wishlistIds = [];
@@ -66,6 +68,12 @@ class _ShopPageState extends State<ShopPage> {
   void initState() {
     super.initState();
     _loadWishlist();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   void _loadWishlist() {
@@ -195,6 +203,7 @@ class _ShopPageState extends State<ShopPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: TextField(
+                    controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Search any Product..',
                       hintStyle: TextStyle(color: Colors.grey.shade400),
@@ -203,6 +212,17 @@ class _ShopPageState extends State<ShopPage> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     ),
+                    textInputAction: TextInputAction.search,
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                    onSubmitted: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
                   ),
                 ),
               ),
@@ -533,14 +553,21 @@ class _ShopPageState extends State<ShopPage> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        var products = snapshot.data!;
+        var products = List<Product>.from(snapshot.data!);
+
+        products = _applySearchFilter(products);
 
         // Sort products
         products = _sortProducts(products);
 
         if (products.isEmpty) {
-          return const Center(
-            child: Text('No products found'),
+          final query = _searchQuery.trim();
+          return Center(
+            child: Text(
+              query.isNotEmpty
+                  ? 'No products found for "$query"'
+                  : 'No products found',
+            ),
           );
         }
 
@@ -559,6 +586,26 @@ class _ShopPageState extends State<ShopPage> {
         );
       },
     );
+  }
+
+  List<Product> _applySearchFilter(List<Product> products) {
+    final query = _searchQuery.trim().toLowerCase();
+    if (query.isEmpty) return products;
+
+    return products.where((product) {
+      final fields = [
+        product.name,
+        product.description,
+        product.category,
+        product.brand ?? '',
+        product.material ?? '',
+        product.tags.join(' '),
+        product.colors.join(' '),
+        product.sizes.join(' '),
+      ];
+
+      return fields.any((value) => value.toLowerCase().contains(query));
+    }).toList();
   }
 
   List<Product> _sortProducts(List<Product> products) {
@@ -620,8 +667,8 @@ class _ShopPageState extends State<ShopPage> {
                               );
                             },
                             errorBuilder: (context, error, stackTrace) {
-                              print('Image load error for ${product.name}: $error');
-                              print('Image URL: ${product.images.isNotEmpty ? product.images.first : "No URL"}');
+                              debugPrint('Image load error for ${product.name}: $error');
+                              debugPrint('Image URL: ${product.images.isNotEmpty ? product.images.first : "No URL"}');
                               return const Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,

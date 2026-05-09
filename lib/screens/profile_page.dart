@@ -450,12 +450,12 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
 
-    if (confirm == true && context.mounted) {
-      await _authService.signOut();
-      if (context.mounted) {
-        Navigator.pushReplacementNamed(context, '/login');
-      }
-    }
+    if (!context.mounted) return;
+    if (confirm != true) return;
+
+    await _authService.signOut();
+    if (!context.mounted) return;
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   void _requireAuth(VoidCallback onAuthenticated) {

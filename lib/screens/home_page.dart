@@ -197,6 +197,7 @@ class _HomePageState extends State<HomePage> {
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
           ),
+          textInputAction: TextInputAction.search,
           onSubmitted: (query) {
             if (query.trim().isNotEmpty) {
               Navigator.pushNamed(
@@ -400,7 +401,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: (category['color'] as MaterialColor).withOpacity(0.3),
+                            color: (category['color'] as MaterialColor).withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),

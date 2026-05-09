@@ -50,11 +50,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final userId = _authService.currentUser?.uid;
     if (userId != null) {
       final isInWishlist = await _wishlistService.isInWishlist(userId, widget.product.id);
-      if (mounted) {
-        setState(() {
-          _isInWishlist = isInWishlist;
-        });
-      }
+      if (!mounted) return;
+      setState(() {
+        _isInWishlist = isInWishlist;
+      });
     }
   }
 
@@ -69,19 +68,19 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     try {
       final cartItems = await _cartService.getCartItems(userId).first;
-      if (context.mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ARTryOnPage(
-              product: widget.product,
-              cartItems: cartItems,
-              selectedSize: _selectedSize,
-            ),
+      if (!context.mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ARTryOnPage(
+            product: widget.product,
+            cartItems: cartItems,
+            selectedSize: _selectedSize,
           ),
-        );
-      }
+        ),
+      );
     } catch (e) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error opening AR: $e')),
       );
@@ -99,26 +98,24 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     try {
       await _wishlistService.toggleWishlist(userId, widget.product.id, _isInWishlist);
-      if (mounted) {
-        setState(() {
-          _isInWishlist = !_isInWishlist;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              _isInWishlist
-                  ? '${widget.product.name} added to wishlist'
-                  : 'Removed from wishlist',
-            ),
+      if (!mounted) return;
+      setState(() {
+        _isInWishlist = !_isInWishlist;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isInWishlist
+                ? '${widget.product.name} added to wishlist'
+                : 'Removed from wishlist',
           ),
-        );
-      }
+        ),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
 
@@ -1223,17 +1220,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     try {
       await _cartService.addToCart(userId, cartItem);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Added to cart successfully')),
-        );
-      }
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Added to cart successfully')),
+      );
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
 

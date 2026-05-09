@@ -74,7 +74,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         decoration: BoxDecoration(
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                               blurRadius: 20,
                               spreadRadius: 2,
                               offset: const Offset(0, 4),
@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         'Sign in to continue your AR shopping experience',
                         style: TextStyle(
                           fontSize: 15,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           height: 1.4,
                         ),
                         textAlign: TextAlign.center,
@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                               blurRadius: 20,
                               offset: const Offset(0, 8),
                             ),
@@ -151,12 +151,12 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         height: 58,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white.withOpacity(0.3), width: 1.5),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
                         ),
                         child: ElevatedButton.icon(
                           onPressed: _isLoading ? null : _signInWithGoogle,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white.withOpacity(0.1),
+                            backgroundColor: Colors.white.withValues(alpha: 0.1),
                             foregroundColor: Colors.white,
                             shadowColor: Colors.transparent,
                             shape: RoundedRectangleBorder(
@@ -189,7 +189,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           Text(
                             "Don't have an account? ",
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                               fontSize: 15,
                             ),
                           ),
@@ -232,7 +232,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 size: 24,
               ),
               style: IconButton.styleFrom(
-                backgroundColor: Colors.white.withOpacity(0.1),
+                backgroundColor: Colors.white.withValues(alpha: 0.1),
                 padding: const EdgeInsets.all(12),
               ),
             ),
@@ -265,17 +265,17 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                     colors: [
                       const Color(0xFF0A1931),
                       const Color(0xFF0F2847),
-                      const Color(0xFF1E3A8A).withOpacity(0.95),
+                      const Color(0xFF1E3A8A).withValues(alpha: 0.95),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     width: 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF185ADB).withOpacity(0.3),
+                      color: const Color(0xFF185ADB).withValues(alpha: 0.3),
                       blurRadius: 40,
                       spreadRadius: 0,
                       offset: const Offset(0, 20),
@@ -312,14 +312,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                   'Sign in to your account',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Colors.white.withOpacity(0.7),
+                                    color: Colors.white.withValues(alpha: 0.7),
                                   ),
                                 ),
                               ],
                             ),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: IconButton(
@@ -340,7 +340,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -352,32 +352,32 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             decoration: InputDecoration(
                               labelText: 'Email Address',
                               labelStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
                               hintText: 'you@example.com',
-                              hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+                              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35)),
                               prefixIcon: Container(
                                 margin: const EdgeInsets.all(12),
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.1),
+                                  color: Colors.white.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Icon(
                                   Icons.email_outlined,
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   size: 20,
                                 ),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -392,7 +392,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                 borderSide: const BorderSide(color: Colors.redAccent, width: 2),
                               ),
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.08),
+                              fillColor: Colors.white.withValues(alpha: 0.08),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                             ),
                             keyboardType: TextInputType.emailAddress,
@@ -414,7 +414,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -426,32 +426,32 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             decoration: InputDecoration(
                               labelText: 'Password',
                               labelStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
                               hintText: '••••••••',
-                              hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+                              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35)),
                               prefixIcon: Container(
                                 margin: const EdgeInsets.all(12),
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.1),
+                                  color: Colors.white.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Icon(
                                   Icons.lock_outlined,
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   size: 20,
                                 ),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -466,14 +466,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                 borderSide: const BorderSide(color: Colors.redAccent, width: 2),
                               ),
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.08),
+                              fillColor: Colors.white.withValues(alpha: 0.08),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _obscurePassword
                                       ? Icons.visibility_outlined
                                       : Icons.visibility_off_outlined,
-                                  color: Colors.white.withOpacity(0.7),
+                                  color: Colors.white.withValues(alpha: 0.7),
                                   size: 22,
                                 ),
                                 onPressed: () {
@@ -510,7 +510,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             child: Text(
                               'Forgot Password?',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13,
                                 decoration: TextDecoration.underline,
@@ -532,13 +532,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.white.withOpacity(0.4),
+                                color: Colors.white.withValues(alpha: 0.4),
                                 blurRadius: 25,
                                 spreadRadius: 1,
                                 offset: const Offset(0, 8),
                               ),
                               BoxShadow(
-                                color: const Color(0xFF185ADB).withOpacity(0.3),
+                                color: const Color(0xFF185ADB).withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 spreadRadius: -5,
                                 offset: const Offset(0, 10),
@@ -609,18 +609,15 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         password: _passwordController.text,
       );
 
-      if (context.mounted) {
-        // Small delay to ensure auth state is fully updated
-        await Future.delayed(const Duration(milliseconds: 300));
-        
-        if (context.mounted) {
-          // Force complete navigation reset to trigger AuthWrapper rebuild
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const AuthWrapper()),
-            (route) => false,
-          );
-        }
-      }
+      if (!context.mounted) return;
+      // Small delay to ensure auth state is fully updated
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (!context.mounted) return;
+      // Force complete navigation reset to trigger AuthWrapper rebuild
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AuthWrapper()),
+        (route) => false,
+      );
     } catch (e) {
       if (context.mounted) {
         // Extract the actual error message
@@ -654,18 +651,15 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     try {
       await _authService.signInWithGoogle();
 
-      if (context.mounted) {
-        // Small delay to ensure auth state is fully updated
-        await Future.delayed(const Duration(milliseconds: 300));
-        
-        if (context.mounted) {
-          // Force complete navigation reset to trigger AuthWrapper rebuild
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const AuthWrapper()),
-            (route) => false,
-          );
-        }
-      }
+      if (!context.mounted) return;
+      // Small delay to ensure auth state is fully updated
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (!context.mounted) return;
+      // Force complete navigation reset to trigger AuthWrapper rebuild
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AuthWrapper()),
+        (route) => false,
+      );
     } catch (e) {
       if (context.mounted) {
         // Extract the actual error message
@@ -703,14 +697,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
     try {
       await _authService.resetPassword(email);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Password reset email sent. Check your inbox.'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password reset email sent. Check your inbox.'),
+          backgroundColor: Colors.green,
+        ),
+      );
     } catch (e) {
       if (context.mounted) {
         // Extract the actual error message
