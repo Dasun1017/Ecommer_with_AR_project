@@ -109,59 +109,66 @@ class _GetStartedPageState extends State<GetStartedPage> {
   }
 
   Widget _buildOnboardingPage(OnboardingItem item) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Illustration
-          Container(
-            height: 280,
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            child: Image.asset(
-              item.image,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                // Fallback if image not found
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(20),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenH = constraints.maxHeight;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Illustration — scales to 35% of available height
+              SizedBox(
+                height: (screenH * 0.35).clamp(160.0, 340.0),
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Image.asset(
+                    item.image,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.image_outlined,
+                            size: 100,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  child: Center(
-                    child: Icon(
-                      Icons.image_outlined,
-                      size: 100,
-                      color: Colors.grey[400],
-                    ),
-                  ),
-                );
-              },
-            ),
+                ),
+              ),
+              // Spacer — 4% of screen height keeps proportion on all screens
+              SizedBox(height: (screenH * 0.04).clamp(16.0, 56.0)),
+              Text(
+                item.title,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                item.description,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-          const SizedBox(height: 50),
-          Text(
-            item.title,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            item.description,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-              height: 1.5,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 

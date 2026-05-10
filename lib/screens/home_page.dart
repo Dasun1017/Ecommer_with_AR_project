@@ -151,7 +151,7 @@ class _HomePageState extends State<HomePage> {
             },
             child: Image.asset(
               'assets/logo/tryverse_logo.png',
-              height: 60,
+              height: MediaQuery.of(context).size.height * 0.075,
               errorBuilder: (context, error, stackTrace) {
                 // Fallback to text logo if image not found
                 return const Text(
@@ -432,15 +432,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildFeaturedBanner() {
+    final screenH = MediaQuery.of(context).size.height;
+    // Adaptive padding: shrinks on shorter screens
+    final bannerPad = (screenH * 0.018).clamp(10.0, 20.0);
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: GestureDetector(
         onTap: () {
-          // Navigate to all products with deals filter
           Navigator.pushNamed(context, '/products', arguments: {'filter': 'deals'});
         },
         child: Container(
-          height: 180,
+          // Let the container size itself to the FittedBox content — no fixed height
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [Colors.pink.shade400, Colors.pink.shade200],
@@ -456,88 +459,86 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      '50-40% OFF',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Now in (product)',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const Text(
-                      'All colours',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Shop Now',
-                            style: TextStyle(
-                              color: Colors.pink.shade400,
-                              fontWeight: FontWeight.w600,
-                            ),
+          child: IntrinsicHeight(
+            child: Stack(
+              children: [
+                // ── Left content — FittedBox scales it down if needed ──
+                Padding(
+                  padding: EdgeInsets.all(bannerPad),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          '50-40% OFF',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(width: 4),
-                          Icon(Icons.arrow_forward, color: Colors.pink.shade400, size: 18),
-                        ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Now in (product)',
+                          style: TextStyle(color: Colors.white, fontSize: 14),
+                        ),
+                        const Text(
+                          'All colours',
+                          style: TextStyle(color: Colors.white, fontSize: 14),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Shop Now',
+                                style: TextStyle(
+                                  color: Colors.pink.shade400,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(Icons.arrow_forward,
+                                  color: Colors.pink.shade400, size: 18),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // ── Right decorative icon — won't push content ──
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  top: 0,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(12),
+                      bottomRight: Radius.circular(12),
+                    ),
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.36,
+                      child: Icon(
+                        Icons.shopping_bag,
+                        size: 90,
+                        color: Colors.white.withValues(alpha: 0.3),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              Positioned(
-                right: 0,
-                bottom: 0,
-                top: 0,
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(12),
-                    bottomRight: Radius.circular(12),
-                  ),
-                  child: Container(
-                    width: 150,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                    ),
-                    child: Icon(
-                      Icons.shopping_bag,
-                      size: 100,
-                      color: Colors.white.withValues(alpha: 0.3),
-                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -584,7 +585,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         SizedBox(
-          height: 240,
+          height: (MediaQuery.of(context).size.height * 0.30).clamp(190.0, 290.0),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -608,7 +609,8 @@ class _HomePageState extends State<HomePage> {
         );
       },
       child: Container(
-        width: 160,
+        width: MediaQuery.of(context).size.width * 0.42,
+        constraints: const BoxConstraints(minWidth: 130, maxWidth: 200),
         margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -624,32 +626,40 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              child: Container(
-                height: 120,
-                width: double.infinity,
-                color: Colors.grey.shade100,
-                child: product.images.isNotEmpty
-                    ? Image.network(
-                        product.images.first,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(Icons.image, size: 50, color: Colors.grey.shade400);
-                        },
-                      )
-                    : Icon(Icons.image, size: 50, color: Colors.grey.shade400),
+            // Image fills ~60% of the card — Flexible prevents overflow
+            Flexible(
+              flex: 6,
+              child: ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(12)),
+                child: Container(
+                  width: double.infinity,
+                  color: Colors.grey.shade100,
+                  child: product.images.isNotEmpty
+                      ? Image.network(
+                          product.images.first,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.image,
+                                size: 50, color: Colors.grey.shade400);
+                          },
+                        )
+                      : Icon(Icons.image,
+                          size: 50, color: Colors.grey.shade400),
+                ),
               ),
             ),
+            // Text section — always shows fully
             Padding(
               padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     product.name,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),
                     maxLines: 2,
@@ -658,12 +668,12 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.star, size: 14, color: Colors.amber.shade700),
+                      Icon(Icons.star, size: 13, color: Colors.amber.shade700),
                       const SizedBox(width: 2),
                       Text(
                         product.rating.toStringAsFixed(1),
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 11,
                           color: Colors.grey.shade600,
                         ),
                       ),
@@ -671,12 +681,13 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'LKR ${product.price.toStringAsFixed(2)}',
+                    'LKR ${product.price.toStringAsFixed(0)}',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue.shade700,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -729,7 +740,7 @@ class _HomePageState extends State<HomePage> {
             crossAxisCount: 2,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 0.75,
+            childAspectRatio: 0.62, // taller cards — more room for text below image
           ),
           itemCount: _featuredProducts.length > 4 ? 4 : _featuredProducts.length,
           itemBuilder: (context, index) {
@@ -764,87 +775,95 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                  child: Container(
-                    height: 140,
-                    width: double.infinity,
-                    color: Colors.grey.shade100,
-                    child: product.images.isNotEmpty
-                        ? Image.network(
-                            product.images.first,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(Icons.image, size: 50, color: Colors.grey.shade400);
-                            },
-                          )
-                        : Icon(Icons.image, size: 50, color: Colors.grey.shade400),
-                  ),
-                ),
-                if (product.isFeatured)
-                  Positioned(
-                    top: 8,
-                    right: 8,
+            // Image fills available space — Flexible prevents overflow
+            Flexible(
+              flex: 6,
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(12)),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.amber,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        'Featured',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                      width: double.infinity,
+                      color: Colors.grey.shade100,
+                      child: product.images.isNotEmpty
+                          ? Image.network(
+                              product.images.first,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(Icons.image,
+                                    size: 50, color: Colors.grey.shade400);
+                              },
+                            )
+                          : Icon(Icons.image,
+                              size: 50, color: Colors.grey.shade400),
                     ),
                   ),
-              ],
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      product.name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const Spacer(),
-                    Row(
-                      children: [
-                        Icon(Icons.star, size: 14, color: Colors.amber.shade700),
-                        const SizedBox(width: 2),
-                        Text(
-                          product.rating.toStringAsFixed(1),
+                  if (product.isFeatured)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.amber,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          'Featured',
                           style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'LKR ${product.price.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade700,
                       ),
                     ),
-                  ],
-                ),
+                ],
+              ),
+            ),
+            // Text section — fixed natural height, never clipped
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    product.name,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.star, size: 13, color: Colors.amber.shade700),
+                      const SizedBox(width: 2),
+                      Text(
+                        product.rating.toStringAsFixed(1),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'LKR ${product.price.toStringAsFixed(0)}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade700,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
           ],

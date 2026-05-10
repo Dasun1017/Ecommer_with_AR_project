@@ -169,7 +169,7 @@ class _ShopPageState extends State<ShopPage> {
             },
             child: Image.asset(
               'assets/logo/tryverse_logo.png',
-              height: 60,
+              height: MediaQuery.of(context).size.height * 0.075,
               errorBuilder: (context, error, stackTrace) {
                 return const Text(
                   'TryVerse',
@@ -327,7 +327,9 @@ class _ShopPageState extends State<ShopPage> {
   Widget _buildCategorySidebar() {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      width: _isCategorySidebarExpanded ? 120 : 50,
+      width: _isCategorySidebarExpanded
+          ? (MediaQuery.of(context).size.width * 0.30).clamp(90.0, 140.0)
+          : (MediaQuery.of(context).size.width * 0.13).clamp(40.0, 60.0),
       color: Colors.grey[100],
       child: Column(
         children: [

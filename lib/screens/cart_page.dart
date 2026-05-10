@@ -274,16 +274,20 @@ class _CartPageState extends State<CartPage> {
                   ),
                 const SizedBox(height: 8),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'LKR ${item.price.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        color: Colors.blue[700],
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    // Price — Flexible lets it shrink on narrow screens
+                    Flexible(
+                      child: Text(
+                        'LKR ${item.price.toStringAsFixed(0)}',
+                        style: TextStyle(
+                          color: Colors.blue[700],
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 8),
                     _buildQuantityControls(item, userId),
                   ],
                 ),
@@ -305,9 +309,9 @@ class _CartPageState extends State<CartPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            icon: Icon(Icons.remove, size: 18, color: Colors.blue[700]),
+            icon: Icon(Icons.remove, size: 16, color: Colors.blue[700]),
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
             onPressed: () async {
               await _cartService.updateCartItemQuantity(
                 userId,
@@ -316,20 +320,20 @@ class _CartPageState extends State<CartPage> {
               );
             },
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
             child: Text(
               '${item.quantity}'.padLeft(2, '0'),
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: 14,
               ),
             ),
           ),
           IconButton(
-            icon: Icon(Icons.add, size: 18, color: Colors.blue[700]),
+            icon: Icon(Icons.add, size: 16, color: Colors.blue[700]),
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
             onPressed: () async {
               await _cartService.updateCartItemQuantity(
                 userId,

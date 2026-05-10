@@ -279,7 +279,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       children: [
         const SizedBox(height: 16),
         Container(
-          height: 300,
+          height: MediaQuery.of(context).size.height * 0.38,
+          constraints: const BoxConstraints(minHeight: 220, maxHeight: 380),
           width: double.infinity,
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
@@ -400,7 +401,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ),
         if (_validImageIndices.length > 1)
           SizedBox(
-            height: 80,
+            height: (MediaQuery.of(context).size.height * 0.10).clamp(60.0, 100.0),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.all(8),
@@ -414,7 +415,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     });
                   },
                   child: Container(
-                    width: 60,
+                    width: MediaQuery.of(context).size.width * 0.155,
+                    constraints: const BoxConstraints(minWidth: 44, maxWidth: 72),
                     margin: const EdgeInsets.only(right: 8),
                     decoration: BoxDecoration(
                       border: Border.all(
