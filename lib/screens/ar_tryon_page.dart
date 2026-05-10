@@ -26,7 +26,7 @@ class ARTryOnPage extends StatefulWidget {
 }
 
 class _ARTryOnPageState extends State<ARTryOnPage> {
-  static const bool _showDebugOverlay = true;
+  static const bool _showDebugOverlay = false;
   static const int _minPoseFrames = 3;
   static const int _poseLostFrames = 6;
   static const double _poseLikelihoodThreshold = 0.4;
@@ -123,12 +123,14 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
   void _setSmartDefaultOverlay() {
     final screen = MediaQuery.of(context).size;
     final sizeScale = _sizeScaleForLabel(widget.selectedSize);
-    // Wider default — 90% of screen width as starting point
-    final w = (screen.width * 0.90 * sizeScale).clamp(200.0, screen.width * 0.95);
+    // Responsive default: 88% of shortest dimension so it fits tall & wide screens
+    final baseW = screen.width < screen.height ? screen.width : screen.height;
+    final w = (baseW * 0.88 * sizeScale).clamp(
+        screen.width * 0.50, screen.width * 0.95);
     final h = w * 1.35;
     final left = (screen.width - w) / 2;
-    // Position shirt higher — 18% from top puts neckline near shoulder area
-    final top  = screen.height * 0.18;
+    // 16% from top — keeps neckline near shoulder area on all aspect ratios
+    final top = screen.height * 0.16;
     setState(() {
       _overlayRect = Rect.fromLTWH(left, top, w, h);
     });
@@ -684,21 +686,40 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
                 // ── Fullscreen camera preview ──────────────────────────
                 _buildFullscreenCamera(),
 
+                // ── Real-time articulated garment painter ──────────────
+                if (_currentPose != null &&
+                    _imageSize != null &&
+                    _imageRotation != null &&
+                    _isPoseDetected)
+                  Positioned.fill(
+                    child: CustomPaint(
+                      painter: GarmentPainter(
+                        pose: _currentPose!,
+                        imageSize: _imageSize!,
+                        rotation: _imageRotation!,
+                        isFrontCamera: _isFrontCamera,
+                        selectedSize: widget.selectedSize,
+                        isSideView: _isSideView,
+                      ),
+                    ),
+                  ),
+
                 // ── Body position guide (shown before overlay appears) ──
                 if (_overlayRect == null)
                   Positioned.fill(
                     child: CustomPaint(painter: _BodyGuidePainter()),
                   ),
                 if (_overlayRect == null)
-                  const Positioned(
-                    bottom: 160,
+                  Positioned(
+                    bottom: MediaQuery.of(context).size.height * 0.18,
                     left: 0,
                     right: 0,
                     child: Column(
                       children: [
-                        Icon(Icons.person_outline, color: Colors.white70, size: 36),
-                        SizedBox(height: 8),
-                        Text(
+                        Icon(Icons.person_outline, color: Colors.white70,
+                            size: MediaQuery.of(context).size.width * 0.09),
+                        const SizedBox(height: 8),
+                        const Text(
                           'Stand 1–2m away\nAlign torso with the outline',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -1136,6 +1157,189 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
       ),
     );
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+/// Draws a body-fitted garment silhouette (torso + sleeves) mapped to
+/// ML Kit pose landmarks in real-time.
+// ─────────────────────────────────────────────────────────────────────────
+class GarmentPainter extends CustomPainter {
+  final Pose pose;
+  final Size imageSize;
+  final InputImageRotation rotation;
+  final bool isFrontCamera;
+  final String? selectedSize;
+  final bool isSideView;
+
+  const GarmentPainter({
+    required this.pose,
+    required this.imageSize,
+    required this.rotation,
+    required this.isFrontCamera,
+    this.selectedSize,
+    this.isSideView = false,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final ls = _screenPos(PoseLandmarkType.leftShoulder, size);
+    final rs = _screenPos(PoseLandmarkType.rightShoulder, size);
+    final le = _screenPos(PoseLandmarkType.leftElbow, size);
+    final re = _screenPos(PoseLandmarkType.rightElbow, size);
+    final lh = _screenPos(PoseLandmarkType.leftHip, size);
+    final rh = _screenPos(PoseLandmarkType.rightHip, size);
+    final nose = _screenPos(PoseLandmarkType.nose, size);
+
+    if (ls == null || rs == null) return;
+
+    final scale = _sizeScale(selectedSize);
+    final sw = (rs.dx - ls.dx).abs(); // shoulder width px
+    // Sleeve clamp is relative to canvas size so it scales on all screen densities
+    final minSleeve = size.width * 0.03;
+    final maxSleeve = size.width * 0.10;
+    final sleeveW = (sw * 0.22 * scale).clamp(minSleeve, maxSleeve);
+
+    // Neck position (between nose and shoulder midpoint)
+    final midShoulderY = (ls.dy + rs.dy) / 2;
+    final midShoulderX = (ls.dx + rs.dx) / 2;
+    final neckPos = nose != null
+        ? Offset(midShoulderX, nose.dy + (midShoulderY - nose.dy) * 0.65)
+        : Offset(midShoulderX, midShoulderY - sw * 0.18);
+
+    // Hip fallback: estimate from shoulder position
+    final hipL = lh ?? Offset(ls.dx - sw * 0.05, ls.dy + sw * 1.75 * scale);
+    final hipR = rh ?? Offset(rs.dx + sw * 0.05, rs.dy + sw * 1.75 * scale);
+
+    // Expand torso slightly beyond shoulders
+    final exp = sw * 0.11 * scale;
+    final tLS = Offset(ls.dx - exp, ls.dy);
+    final tRS = Offset(rs.dx + exp, rs.dy);
+    final tLH = Offset(hipL.dx - exp * 0.4, hipL.dy);
+    final tRH = Offset(hipR.dx + exp * 0.4, hipR.dy);
+
+    // ── Paints ────────────────────────────────────────────────────
+    final fillPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = Colors.white.withValues(alpha: 0.18);
+
+    // strokeWidth scales with screen density so lines look the same on all phones
+    final strokePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = (size.width * 0.005).clamp(1.5, 3.5)
+      ..color = Colors.white.withValues(alpha: 0.72)
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round;
+
+    final collarPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = (size.width * 0.004).clamp(1.5, 3.0)
+      ..color = Colors.white.withValues(alpha: 0.90);
+
+    // ── Torso path ────────────────────────────────────────────────
+    final torso = Path()
+      ..moveTo(neckPos.dx - sw * 0.09, neckPos.dy)
+      ..lineTo(tLS.dx, tLS.dy)
+      ..lineTo(tLH.dx, tLH.dy)
+      ..lineTo(tRH.dx, tRH.dy)
+      ..lineTo(tRS.dx, tRS.dy)
+      ..lineTo(neckPos.dx + sw * 0.09, neckPos.dy)
+      ..close();
+
+    canvas.drawPath(torso, fillPaint);
+    canvas.drawPath(torso, strokePaint);
+
+    // ── Left sleeve ───────────────────────────────────────────────
+    final leftElbow = le ??
+        Offset(ls.dx - sw * 0.55, ls.dy + sw * 0.55);
+    _drawSleeve(canvas, fillPaint, strokePaint, tLS, leftElbow, sleeveW);
+
+    // ── Right sleeve ──────────────────────────────────────────────
+    final rightElbow = re ??
+        Offset(rs.dx + sw * 0.55, rs.dy + sw * 0.55);
+    _drawSleeve(canvas, fillPaint, strokePaint, tRS, rightElbow, sleeveW);
+
+    // ── Collar (neckline oval) ────────────────────────────────────
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: neckPos,
+        width: sw * 0.22,
+        height: sw * 0.13,
+      ),
+      collarPaint,
+    );
+
+    // ── Centre seam line (stitching detail) ───────────────────────
+    final seamPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..color = Colors.white.withValues(alpha: 0.30);
+    canvas.drawLine(
+      Offset(midShoulderX, neckPos.dy + sw * 0.05),
+      Offset(midShoulderX, (tLH.dy + tRH.dy) / 2),
+      seamPaint,
+    );
+  }
+
+  void _drawSleeve(
+    Canvas canvas,
+    Paint fill,
+    Paint stroke,
+    Offset shoulder,
+    Offset elbow,
+    double width,
+  ) {
+    final dir = elbow - shoulder;
+    final len = dir.distance;
+    if (len < 1) return;
+    final norm = Offset(dir.dx / len, dir.dy / len);
+    final perp = Offset(-norm.dy, norm.dx);
+
+    // Tapered sleeve (slightly narrower at elbow)
+    final path = Path()
+      ..moveTo(shoulder.dx + perp.dx * width,      shoulder.dy + perp.dy * width)
+      ..lineTo(shoulder.dx - perp.dx * width,      shoulder.dy - perp.dy * width)
+      ..lineTo(elbow.dx   - perp.dx * width * 0.6, elbow.dy   - perp.dy * width * 0.6)
+      ..lineTo(elbow.dx   + perp.dx * width * 0.6, elbow.dy   + perp.dy * width * 0.6)
+      ..close();
+
+    canvas.drawPath(path, fill);
+    canvas.drawPath(path, stroke);
+  }
+
+  double _sizeScale(String? s) {
+    switch (s?.toUpperCase()) {
+      case 'XS':   return 0.72;
+      case 'S':    return 0.82;
+      case 'M':    return 1.00;
+      case 'L':    return 1.18;
+      case 'XL':   return 1.36;
+      case 'XXL':  return 1.55;
+      case 'XXXL': return 1.75;
+      default:     return 1.00;
+    }
+  }
+
+  Offset? _screenPos(PoseLandmarkType type, Size size) {
+    final lm = pose.landmarks[type];
+    if (lm == null || lm.likelihood < 0.30) return null;
+    double nx, ny;
+    if (rotation == InputImageRotation.rotation90deg ||
+        rotation == InputImageRotation.rotation270deg) {
+      nx = lm.y / imageSize.height;
+      ny = lm.x / imageSize.width;
+    } else {
+      nx = lm.x / imageSize.width;
+      ny = lm.y / imageSize.height;
+    }
+    if (isFrontCamera) nx = 1.0 - nx;
+    return Offset(
+      nx.clamp(0.0, 1.0) * size.width,
+      ny.clamp(0.0, 1.0) * size.height,
+    );
+  }
+
+  @override
+  bool shouldRepaint(GarmentPainter old) => true;
 }
 
 /// Custom painter to visualize pose landmarks on camera feed
