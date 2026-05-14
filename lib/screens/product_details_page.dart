@@ -26,7 +26,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   List<int> _validImageIndices = [];
   int _selectedTab = 0;
   bool _isInWishlist = false;
-  
+
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _overviewKey = GlobalKey();
   final GlobalKey _ratingsKey = GlobalKey();
@@ -42,14 +42,16 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       _selectedSize = widget.product.sizes.first;
     }
     // Initialize with all image indices, they will be filtered as they load/fail
-    _validImageIndices = List.generate(widget.product.images.length, (index) => index);
+    _validImageIndices =
+        List.generate(widget.product.images.length, (index) => index);
     _checkWishlistStatus();
   }
 
   void _checkWishlistStatus() async {
     final userId = _authService.currentUser?.uid;
     if (userId != null) {
-      final isInWishlist = await _wishlistService.isInWishlist(userId, widget.product.id);
+      final isInWishlist =
+          await _wishlistService.isInWishlist(userId, widget.product.id);
       if (!mounted) return;
       setState(() {
         _isInWishlist = isInWishlist;
@@ -59,10 +61,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   Future<void> _goToARTryOn() async {
     final userId = _authService.currentUser?.uid;
-    
+
     try {
-      final cartItems = userId != null ? await _cartService.getCartItems(userId).first : <CartItem>[];
-      if (!context.mounted) return;
+      final cartItems = userId != null
+          ? await _cartService.getCartItems(userId).first
+          : <CartItem>[];
+      if (!mounted) return;
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -74,7 +78,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ),
       );
     } catch (e) {
-      if (!context.mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error opening AR: $e')),
       );
@@ -91,7 +95,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     }
 
     try {
-      await _wishlistService.toggleWishlist(userId, widget.product.id, _isInWishlist);
+      await _wishlistService.toggleWishlist(
+          userId, widget.product.id, _isInWishlist);
       if (!mounted) return;
       setState(() {
         _isInWishlist = !_isInWishlist;
@@ -123,13 +128,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     setState(() {
       _selectedTab = tabIndex;
     });
-    
+
     final context = key.currentContext;
     if (context != null) {
       final box = context.findRenderObject() as RenderBox;
       final position = box.localToGlobal(Offset.zero, ancestor: null);
-      final offset = _scrollController.offset + position.dy - 100; // 100px offset for app bar and tabs
-      
+      final offset = _scrollController.offset +
+          position.dy -
+          100; // 100px offset for app bar and tabs
+
       _scrollController.animateTo(
         offset,
         duration: const Duration(milliseconds: 500),
@@ -246,7 +253,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final isSelected = _selectedTab == index;
     return GestureDetector(
       onTap: () {
-        final key = index == 0 ? _overviewKey : (index == 1 ? _ratingsKey : _detailsKey);
+        final key = index == 0
+            ? _overviewKey
+            : (index == 1 ? _ratingsKey : _detailsKey);
         _scrollToSection(key, index);
       },
       child: Container(
@@ -305,7 +314,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               setState(() {
                                 _validImageIndices.remove(_selectedImageIndex);
                                 if (_validImageIndices.isNotEmpty) {
-                                  _selectedImageIndex = _validImageIndices.first;
+                                  _selectedImageIndex =
+                                      _validImageIndices.first;
                                 }
                               });
                             }
@@ -314,7 +324,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.broken_image, size: 80, color: Colors.grey),
+                                Icon(Icons.broken_image,
+                                    size: 80, color: Colors.grey),
                                 SizedBox(height: 8),
                                 Text('Image not available'),
                               ],
@@ -337,9 +348,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       ),
                       onPressed: () {
                         setState(() {
-                          final currentListIndex = _validImageIndices.indexOf(_selectedImageIndex);
+                          final currentListIndex =
+                              _validImageIndices.indexOf(_selectedImageIndex);
                           if (currentListIndex > 0) {
-                            _selectedImageIndex = _validImageIndices[currentListIndex - 1];
+                            _selectedImageIndex =
+                                _validImageIndices[currentListIndex - 1];
                           }
                         });
                       },
@@ -359,9 +372,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       ),
                       onPressed: () {
                         setState(() {
-                          final currentListIndex = _validImageIndices.indexOf(_selectedImageIndex);
-                          if (currentListIndex < _validImageIndices.length - 1) {
-                            _selectedImageIndex = _validImageIndices[currentListIndex + 1];
+                          final currentListIndex =
+                              _validImageIndices.indexOf(_selectedImageIndex);
+                          if (currentListIndex <
+                              _validImageIndices.length - 1) {
+                            _selectedImageIndex =
+                                _validImageIndices[currentListIndex + 1];
                           }
                         });
                       },
@@ -372,7 +388,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 bottom: 12,
                 right: 12,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.blue[700],
                     borderRadius: BorderRadius.circular(20),
@@ -384,7 +401,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       SizedBox(width: 4),
                       Text(
                         'AR',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -395,7 +413,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ),
         if (_validImageIndices.length > 1)
           SizedBox(
-            height: (MediaQuery.of(context).size.height * 0.10).clamp(60.0, 100.0),
+            height:
+                (MediaQuery.of(context).size.height * 0.10).clamp(60.0, 100.0),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.all(8),
@@ -410,7 +429,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   },
                   child: Container(
                     width: MediaQuery.of(context).size.width * 0.155,
-                    constraints: const BoxConstraints(minWidth: 44, maxWidth: 72),
+                    constraints:
+                        const BoxConstraints(minWidth: 44, maxWidth: 72),
                     margin: const EdgeInsets.only(right: 8),
                     decoration: BoxDecoration(
                       border: Border.all(
@@ -442,8 +462,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             if (mounted) {
                               setState(() {
                                 _validImageIndices.remove(index);
-                                if (_selectedImageIndex == index && _validImageIndices.isNotEmpty) {
-                                  _selectedImageIndex = _validImageIndices.first;
+                                if (_selectedImageIndex == index &&
+                                    _validImageIndices.isNotEmpty) {
+                                  _selectedImageIndex =
+                                      _validImageIndices.first;
                                 }
                               });
                             }
@@ -494,15 +516,18 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         const Icon(Icons.star, color: Colors.amber, size: 18),
                         Text(
                           ' ${widget.product.rating.toStringAsFixed(1)}',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           ' ( ${widget.product.reviewCount} )',
-                          style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                          style:
+                              TextStyle(color: Colors.grey[600], fontSize: 14),
                         ),
                         Text(
                           ' | ${widget.product.stock}Sold',
-                          style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                          style:
+                              TextStyle(color: Colors.grey[600], fontSize: 14),
                         ),
                       ],
                     ),
@@ -569,7 +594,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             children: widget.product.colors.map((colorName) {
               final isSelected = _selectedColor == colorName;
               final colorValue = _getColorFromName(colorName);
-              
+
               return GestureDetector(
                 onTap: () {
                   setState(() {
@@ -613,7 +638,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   Color _getColorFromName(String colorName) {
     final lowerName = colorName.toLowerCase().trim();
-    
+
     // Basic colors
     if (lowerName.contains('black')) return Colors.black;
     if (lowerName.contains('white')) return Colors.white;
@@ -625,8 +650,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     if (lowerName.contains('purple')) return Colors.purple;
     if (lowerName.contains('pink')) return Colors.pink;
     if (lowerName.contains('brown')) return Colors.brown;
-    if (lowerName.contains('grey') || lowerName.contains('gray')) return Colors.grey;
-    
+    if (lowerName.contains('grey') || lowerName.contains('gray')) {
+      return Colors.grey;
+    }
+
     // Shades
     if (lowerName.contains('navy')) return const Color(0xFF000080);
     if (lowerName.contains('maroon')) return const Color(0xFF800000);
@@ -639,7 +666,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     if (lowerName.contains('beige')) return const Color(0xFFF5F5DC);
     if (lowerName.contains('khaki')) return const Color(0xFFC3B091);
     if (lowerName.contains('cream')) return const Color(0xFFFFFDD0);
-    
+
     // Default fallback
     return Colors.grey[400]!;
   }
@@ -741,100 +768,100 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Rating Summary
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.product.rating.toStringAsFixed(1),
-                        style: const TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: List.generate(5, (index) {
-                          return Icon(
-                            index < widget.product.rating.floor()
-                                ? Icons.star
-                                : Icons.star_border,
-                            color: Colors.amber,
-                            size: 20,
-                          );
-                        }),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${widget.product.reviewCount} reviews',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      _buildRatingBar(5, 0.7),
-                      _buildRatingBar(4, 0.2),
-                      _buildRatingBar(3, 0.06),
-                      _buildRatingBar(2, 0.03),
-                      _buildRatingBar(1, 0.01),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          // Reviews Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Customer Reviews',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.product.rating.toStringAsFixed(1),
+                            style: const TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: List.generate(5, (index) {
+                              return Icon(
+                                index < widget.product.rating.floor()
+                                    ? Icons.star
+                                    : Icons.star_border,
+                                color: Colors.amber,
+                                size: 20,
+                              );
+                            }),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${widget.product.reviewCount} reviews',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          _buildRatingBar(5, 0.7),
+                          _buildRatingBar(4, 0.2),
+                          _buildRatingBar(3, 0.06),
+                          _buildRatingBar(2, 0.03),
+                          _buildRatingBar(1, 0.01),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              TextButton(
-                onPressed: () {},
-                child: const Text('Write a Review'),
+              const SizedBox(height: 24),
+              // Reviews Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Customer Reviews',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text('Write a Review'),
+                  ),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // Sample Reviews
-          _buildReviewCard(
-            'John Doe',
-            5.0,
-            'Great quality hoodie! Very comfortable and the graphics are amazing.',
-            '2 days ago',
-          ),
-          _buildReviewCard(
-            'Sarah Smith',
-            4.0,
-            'Love the design. Fits well but slightly larger than expected.',
-            '1 week ago',
-          ),
-          _buildReviewCard(
-            'Mike Johnson',
-            5.0,
-            'Excellent product! Fast delivery and perfect packaging.',
-            '2 weeks ago',
-          ),
+              const SizedBox(height: 16),
+              // Sample Reviews
+              _buildReviewCard(
+                'John Doe',
+                5.0,
+                'Great quality hoodie! Very comfortable and the graphics are amazing.',
+                '2 days ago',
+              ),
+              _buildReviewCard(
+                'Sarah Smith',
+                4.0,
+                'Love the design. Fits well but slightly larger than expected.',
+                '1 week ago',
+              ),
+              _buildReviewCard(
+                'Mike Johnson',
+                5.0,
+                'Excellent product! Fast delivery and perfect packaging.',
+                '2 weeks ago',
+              ),
             ],
           ),
         ),
@@ -872,7 +899,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
-  Widget _buildReviewCard(String name, double rating, String comment, String date) {
+  Widget _buildReviewCard(
+      String name, double rating, String comment, String date) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -908,7 +936,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     Row(
                       children: List.generate(5, (index) {
                         return Icon(
-                          index < rating.floor() ? Icons.star : Icons.star_border,
+                          index < rating.floor()
+                              ? Icons.star
+                              : Icons.star_border,
                           color: Colors.amber,
                           size: 14,
                         );
@@ -973,13 +1003,18 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               const SizedBox(height: 16),
               _buildDetailRow('Product Name', widget.product.name),
               _buildDetailRow('Category', widget.product.category),
-              _buildDetailRow('Price', 'LKR ${widget.product.price.toStringAsFixed(2)}'),
-              _buildDetailRow('Stock Available', '${widget.product.stock} units'),
+              _buildDetailRow(
+                  'Price', 'LKR ${widget.product.price.toStringAsFixed(2)}'),
+              _buildDetailRow(
+                  'Stock Available', '${widget.product.stock} units'),
               if (widget.product.colors.isNotEmpty)
-                _buildDetailRow('Available Colors', widget.product.colors.join(', ')),
+                _buildDetailRow(
+                    'Available Colors', widget.product.colors.join(', ')),
               if (widget.product.sizes.isNotEmpty)
-                _buildDetailRow('Available Sizes', widget.product.sizes.join(', ')),
-              _buildDetailRow('Rating', '${widget.product.rating.toStringAsFixed(1)} / 5.0'),
+                _buildDetailRow(
+                    'Available Sizes', widget.product.sizes.join(', ')),
+              _buildDetailRow('Rating',
+                  '${widget.product.rating.toStringAsFixed(1)} / 5.0'),
               _buildDetailRow('Total Reviews', '${widget.product.reviewCount}'),
               _buildDetailRow('Product ID', widget.product.id),
               if (widget.product.arModelUrl != null)
@@ -1119,8 +1154,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
-
-
   Widget _buildBottomBar() {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -1216,12 +1249,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     try {
       await _cartService.addToCart(userId, cartItem);
-      if (!context.mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Added to cart successfully')),
       );
     } catch (e) {
-      if (!context.mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
@@ -1235,7 +1268,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   Widget _buildCartIconWithBadge() {
     final userId = _authService.currentUser?.uid;
-    
+
     if (userId == null) {
       return IconButton(
         icon: const Icon(Icons.shopping_cart_outlined),

@@ -10,6 +10,7 @@ import '../screens/cart_page.dart';
 import '../screens/checkout_page.dart';
 import '../screens/profile_page.dart';
 import '../screens/notification_page.dart';
+import '../screens/ar_tryon_page.dart';
 import '../screens/admin/admin_dashboard.dart';
 import '../screens/admin/manage_products_page.dart';
 import '../screens/admin/manage_orders_page.dart';
@@ -19,7 +20,7 @@ import '../models/cart_item_model.dart';
 
 class AppRoutes {
   // ==================== APP NAVIGATION STRUCTURE ====================
-  // 
+  //
   // INITIAL FLOW:
   // 1. App opens → AuthWrapper (checks authentication)
   // 2. First launch → GetStartedPage (onboarding)
@@ -39,13 +40,13 @@ class AppRoutes {
   // - Admin Side: AdminDashboard → only navigates to admin/* routes
   // - Client Side: HomePage → only navigates to client routes (shop, cart, profile, etc.)
   // - No cross-navigation between admin and client sides
-  // 
+  //
   // ==================================================================
-  
+
   static const String getStarted = '/';
   static const String login = '/login';
   static const String register = '/register';
-  
+
   // CLIENT ROUTES (accessible from client side only)
   static const String home = '/home';
   static const String shop = '/shop';
@@ -55,7 +56,8 @@ class AppRoutes {
   static const String checkout = '/checkout';
   static const String profile = '/profile';
   static const String notifications = '/notifications';
-  
+  static const String arTryOn = '/ar-try-on';
+
   // ADMIN ROUTES (accessible from admin side only)
   static const String adminDashboard = '/admin/dashboard';
   static const String adminProducts = '/admin/products';
@@ -68,24 +70,24 @@ class AppRoutes {
     // - Admin pages only contain navigation to admin routes
     // - Client pages only contain navigation to client routes
     // - This prevents unauthorized access through proper app architecture
-    
+
     switch (settings.name) {
       case getStarted:
         return MaterialPageRoute(builder: (_) => const GetStartedPage());
-      
+
       case login:
         return MaterialPageRoute(builder: (_) => const LoginPage());
-      
+
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterPage());
-      
+
       // ==================== CLIENT ROUTES ====================
       case home:
         return MaterialPageRoute(builder: (_) => const HomePage());
-      
+
       case shop:
         return MaterialPageRoute(builder: (_) => const ShopPage());
-      
+
       case products:
         final args = settings.arguments as Map<String, dynamic>?;
         return MaterialPageRoute(
@@ -96,16 +98,16 @@ class AppRoutes {
             filter: args?['filter'] as String?,
           ),
         );
-      
+
       case productDetails:
         final product = settings.arguments as Product;
         return MaterialPageRoute(
           builder: (_) => ProductDetailsPage(product: product),
         );
-      
+
       case cart:
         return MaterialPageRoute(builder: (_) => const CartPage());
-      
+
       case checkout:
         final args = settings.arguments as Map<String, dynamic>;
         final items = args['items'] as List<CartItem>;
@@ -113,13 +115,16 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (_) => CheckoutPage(items: items, total: total),
         );
-      
+
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfilePage());
-      
+
       case notifications:
         return MaterialPageRoute(builder: (_) => const NotificationPage());
-      
+
+      case arTryOn:
+        return MaterialPageRoute(builder: (_) => const ARTryOnPage());
+
       // ==================== ADMIN ROUTES ====================
       // These routes are for admin users only
       // Client pages don't navigate to these routes
@@ -127,19 +132,19 @@ class AppRoutes {
       // 1. AuthWrapper routes admins to AdminDashboard initially
       // 2. Admin pages only contain navigation to other admin routes
       // 3. No direct links from client side to admin routes
-      
+
       case adminDashboard:
         return MaterialPageRoute(builder: (_) => const AdminDashboard());
-      
+
       case adminProducts:
         return MaterialPageRoute(builder: (_) => const ManageProductsPage());
-      
+
       case adminOrders:
         return MaterialPageRoute(builder: (_) => const ManageOrdersPage());
-      
+
       case adminUsers:
         return MaterialPageRoute(builder: (_) => const ManageUsersPage());
-      
+
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

@@ -48,64 +48,66 @@ class _CartPageState extends State<CartPage> {
             _buildHeader(),
             Expanded(
               child: StreamBuilder<List<CartItem>>(
-        stream: _cartService.getCartItems(userId),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
+                stream: _cartService.getCartItems(userId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
 
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-          final cartItems = snapshot.data!;
+                  final cartItems = snapshot.data!;
 
-          if (cartItems.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.shopping_cart_outlined,
-                    size: 100,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Your cart is empty',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pushNamed(context, '/shop'),
-                    child: const Text('Start Shopping'),
-                  ),
-                ],
-              ),
-            );
-          }
+                  if (cartItems.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.shopping_cart_outlined,
+                            size: 100,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Your cart is empty',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () =>
+                                Navigator.pushNamed(context, '/shop'),
+                            child: const Text('Start Shopping'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
 
-          return Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
+                  return Column(
                     children: [
-                      ...cartItems.map((item) => _buildCartItem(item, userId)),
-                      const SizedBox(height: 16),
-                      _buildOrderSummary(cartItems),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              ...cartItems
+                                  .map((item) => _buildCartItem(item, userId)),
+                              const SizedBox(height: 16),
+                              _buildOrderSummary(cartItems),
+                            ],
+                          ),
+                        ),
+                      ),
+                      _buildCheckoutButton(cartItems),
                     ],
-                  ),
-                ),
-              ),
-              _buildCheckoutButton(cartItems),
-            ],
-          );
-        },
+                  );
+                },
               ),
             ),
           ],
@@ -158,7 +160,7 @@ class _CartPageState extends State<CartPage> {
 
   Widget _buildNotificationIcon() {
     final user = FirebaseAuth.instance.currentUser;
-    
+
     if (user == null) {
       return IconButton(
         icon: const Icon(Icons.notifications_outlined, size: 28),
@@ -244,7 +246,8 @@ class _CartPageState extends State<CartPage> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline, color: Colors.red, size: 22),
+                      icon: const Icon(Icons.delete_outline,
+                          color: Colors.red, size: 22),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                       onPressed: () async {
@@ -252,7 +255,8 @@ class _CartPageState extends State<CartPage> {
                         await _cartService.removeFromCart(userId, item.id);
                         if (!mounted) return;
                         messenger.showSnackBar(
-                          const SnackBar(content: Text('Item removed from cart')),
+                          const SnackBar(
+                              content: Text('Item removed from cart')),
                         );
                       },
                     ),
@@ -263,8 +267,10 @@ class _CartPageState extends State<CartPage> {
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
                       [
-                        if (item.selectedColor != null) 'Color: ${item.selectedColor}',
-                        if (item.selectedSize != null) 'Size: ${item.selectedSize}',
+                        if (item.selectedColor != null)
+                          'Color: ${item.selectedColor}',
+                        if (item.selectedSize != null)
+                          'Size: ${item.selectedSize}',
                       ].join(', '),
                       style: TextStyle(
                         color: Colors.grey[600],
@@ -348,7 +354,8 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget _buildOrderSummary(List<CartItem> items) {
-    final subtotal = items.fold<double>(0, (total, item) => total + item.totalPrice);
+    final subtotal =
+        items.fold<double>(0, (total, item) => total + item.totalPrice);
     const discount = 0.0;
     const deliveryCharges = 350.0;
     final total = subtotal - discount + deliveryCharges;
@@ -383,15 +390,18 @@ class _CartPageState extends State<CartPage> {
           const SizedBox(height: 8),
           _buildSummaryRow('Discount', 'LKR ${discount.toStringAsFixed(2)}'),
           const SizedBox(height: 8),
-          _buildSummaryRow('Delivery Charges', 'LKR ${deliveryCharges.toStringAsFixed(2)}'),
+          _buildSummaryRow(
+              'Delivery Charges', 'LKR ${deliveryCharges.toStringAsFixed(2)}'),
           const Divider(height: 24),
-          _buildSummaryRow('Total', 'LKR ${total.toStringAsFixed(2)}', isTotal: true),
+          _buildSummaryRow('Total', 'LKR ${total.toStringAsFixed(2)}',
+              isTotal: true),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, {bool isTotal = false, bool isCount = false}) {
+  Widget _buildSummaryRow(String label, String value,
+      {bool isTotal = false, bool isCount = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -416,7 +426,8 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget _buildCheckoutButton(List<CartItem> items) {
-    final subtotal = items.fold<double>(0, (total, item) => total + item.totalPrice);
+    final subtotal =
+        items.fold<double>(0, (total, item) => total + item.totalPrice);
     final total = subtotal + 350.0;
 
     return Container(
@@ -487,7 +498,7 @@ class _CartPageState extends State<CartPage> {
               Navigator.pushReplacementNamed(context, '/shop');
               break;
             case 2:
-              // Try AR logic here
+              Navigator.pushNamed(context, '/ar-try-on');
               break;
             case 3:
               // Already on cart
@@ -526,7 +537,8 @@ class _CartPageState extends State<CartPage> {
                 color: Colors.blue.shade200,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.shopping_cart, color: Colors.blue[900], size: 24),
+              child:
+                  Icon(Icons.shopping_cart, color: Colors.blue[900], size: 24),
             ),
             label: 'Cart',
           ),

@@ -6,6 +6,7 @@ import '../services/auth_service.dart';
 import '../services/cart_service.dart';
 import '../services/notification_service.dart';
 import '../models/product_model.dart';
+import '../widgets/login_required_dialog.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key});
@@ -42,26 +43,7 @@ class _ShopPageState extends State<ShopPage> {
 
   /// Show dialog prompting user to login
   void _showLoginPrompt() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Login Required'),
-        content: const Text('Please login to access this feature'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, '/login');
-            },
-            child: const Text('Login'),
-          ),
-        ],
-      ),
-    );
+    showLoginRequiredDialog(context);
   }
 
   @override
@@ -207,7 +189,8 @@ class _ShopPageState extends State<ShopPage> {
                     decoration: InputDecoration(
                       hintText: 'Search any Product..',
                       hintStyle: TextStyle(color: Colors.grey.shade400),
-                      prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
+                      prefixIcon:
+                          Icon(Icons.search, color: Colors.grey.shade600),
                       suffixIcon: Icon(Icons.mic, color: Colors.grey.shade600),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(vertical: 12),
@@ -228,7 +211,8 @@ class _ShopPageState extends State<ShopPage> {
               ),
               const SizedBox(width: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(6),
@@ -242,7 +226,8 @@ class _ShopPageState extends State<ShopPage> {
                         style: TextStyle(fontSize: 13),
                       ),
                       const SizedBox(width: 4),
-                      Icon(Icons.swap_vert, size: 18, color: Colors.grey.shade700),
+                      Icon(Icons.swap_vert,
+                          size: 18, color: Colors.grey.shade700),
                     ],
                   ),
                   onSelected: (value) {
@@ -278,7 +263,8 @@ class _ShopPageState extends State<ShopPage> {
                   borderRadius: BorderRadius.circular(6),
                   border: Border.all(color: Colors.grey.shade300),
                 ),
-                child: Icon(Icons.filter_list, size: 20, color: Colors.grey.shade700),
+                child: Icon(Icons.filter_list,
+                    size: 20, color: Colors.grey.shade700),
               ),
             ],
           ),
@@ -287,7 +273,8 @@ class _ShopPageState extends State<ShopPage> {
             Padding(
               padding: const EdgeInsets.only(top: 12),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.blue.shade50,
                   borderRadius: BorderRadius.circular(20),
@@ -313,7 +300,8 @@ class _ShopPageState extends State<ShopPage> {
                           _selectedCategory = null;
                         });
                       },
-                      child: Icon(Icons.close, size: 16, color: Colors.blue.shade700),
+                      child: Icon(Icons.close,
+                          size: 16, color: Colors.blue.shade700),
                     ),
                   ],
                 ),
@@ -348,7 +336,9 @@ class _ShopPageState extends State<ShopPage> {
             ),
             child: IconButton(
               icon: Icon(
-                _isCategorySidebarExpanded ? Icons.chevron_left : Icons.chevron_right,
+                _isCategorySidebarExpanded
+                    ? Icons.chevron_left
+                    : Icons.chevron_right,
                 size: 24,
               ),
               onPressed: () {
@@ -379,7 +369,8 @@ class _ShopPageState extends State<ShopPage> {
                     return InkWell(
                       onTap: () {
                         setState(() {
-                          _selectedCategory = category == 'All' ? null : category;
+                          _selectedCategory =
+                              category == 'All' ? null : category;
                         });
                       },
                       child: Tooltip(
@@ -393,7 +384,9 @@ class _ShopPageState extends State<ShopPage> {
                             color: isSelected ? Colors.blue[50] : null,
                             border: Border(
                               left: BorderSide(
-                                color: isSelected ? Colors.blue : Colors.transparent,
+                                color: isSelected
+                                    ? Colors.blue
+                                    : Colors.transparent,
                                 width: 3,
                               ),
                             ),
@@ -402,15 +395,20 @@ class _ShopPageState extends State<ShopPage> {
                               ? Text(
                                   category,
                                   style: TextStyle(
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                    color: isSelected ? Colors.blue : Colors.black,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color:
+                                        isSelected ? Colors.blue : Colors.black,
                                     fontSize: 14,
                                   ),
                                 )
                               : Icon(
                                   _getCategoryIcon(category),
                                   size: 24,
-                                  color: isSelected ? Colors.blue : Colors.grey.shade600,
+                                  color: isSelected
+                                      ? Colors.blue
+                                      : Colors.grey.shade600,
                                 ),
                         ),
                       ),
@@ -429,7 +427,7 @@ class _ShopPageState extends State<ShopPage> {
     switch (category.toLowerCase()) {
       case 'all':
         return Icons.grid_view;
-      
+
       // Clothing Categories
       case 'shirts':
         return Icons.checkroom;
@@ -454,7 +452,7 @@ class _ShopPageState extends State<ShopPage> {
       case 'activewear':
       case 'sportswear':
         return Icons.sports;
-      
+
       // Footwear
       case 'shoes':
       case 'sneakers':
@@ -462,7 +460,7 @@ class _ShopPageState extends State<ShopPage> {
         return Icons.backpack;
       case 'sandals':
         return Icons.beach_access;
-      
+
       // Accessories
       case 'accessories':
         return Icons.watch;
@@ -482,7 +480,7 @@ class _ShopPageState extends State<ShopPage> {
       case 'hats':
       case 'caps':
         return Icons.checkroom;
-      
+
       // Gender/Age Categories
       case 'men':
       case 'mens':
@@ -495,7 +493,7 @@ class _ShopPageState extends State<ShopPage> {
         return Icons.child_care;
       case 'baby':
         return Icons.child_friendly;
-      
+
       // General Categories
       case 'electronics':
       case 'gadgets':
@@ -524,7 +522,7 @@ class _ShopPageState extends State<ShopPage> {
         return Icons.shopping_basket;
       case 'pets':
         return Icons.pets;
-      
+
       // Special Categories
       case 'sale':
       case 'offers':
@@ -535,7 +533,7 @@ class _ShopPageState extends State<ShopPage> {
       case 'trending':
       case 'popular':
         return Icons.trending_up;
-      
+
       default:
         return Icons.category;
     }
@@ -630,7 +628,7 @@ class _ShopPageState extends State<ShopPage> {
 
   Widget _buildProductCard(Product product) {
     final isInWishlist = _wishlistIds.contains(product.id);
-    
+
     return InkWell(
       onTap: () => Navigator.pushNamed(
         context,
@@ -661,7 +659,8 @@ class _ShopPageState extends State<ShopPage> {
                               if (loadingProgress == null) return child;
                               return Center(
                                 child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes != null
+                                  value: loadingProgress.expectedTotalBytes !=
+                                          null
                                       ? loadingProgress.cumulativeBytesLoaded /
                                           loadingProgress.expectedTotalBytes!
                                       : null,
@@ -669,16 +668,23 @@ class _ShopPageState extends State<ShopPage> {
                               );
                             },
                             errorBuilder: (context, error, stackTrace) {
-                              debugPrint('Image load error for ${product.name}: $error');
-                              debugPrint('Image URL: ${product.images.isNotEmpty ? product.images.first : "No URL"}');
+                              debugPrint(
+                                  'Image load error for ${product.name}: $error');
+                              debugPrint(
+                                  'Image URL: ${product.images.isNotEmpty ? product.images.first : "No URL"}');
                               return const Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                                    Icon(Icons.broken_image,
+                                        size: 40, color: Colors.grey),
                                     SizedBox(height: 4),
-                                    Text('Image not available', style: TextStyle(fontSize: 9), textAlign: TextAlign.center),
-                                    Text('(Check console)', style: TextStyle(fontSize: 8, color: Colors.grey)),
+                                    Text('Image not available',
+                                        style: TextStyle(fontSize: 9),
+                                        textAlign: TextAlign.center),
+                                    Text('(Check console)',
+                                        style: TextStyle(
+                                            fontSize: 8, color: Colors.grey)),
                                   ],
                                 ),
                               );
@@ -801,7 +807,7 @@ class _ShopPageState extends State<ShopPage> {
               // Shop - already here
               break;
             case 2:
-              // Try AR - will be implemented later
+              Navigator.pushNamed(context, '/ar-try-on');
               break;
             case 3:
               // Cart - requires authentication
@@ -835,7 +841,8 @@ class _ShopPageState extends State<ShopPage> {
                       color: Colors.blue.shade300,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.home, color: Colors.blue.shade900, size: 24),
+                    child:
+                        Icon(Icons.home, color: Colors.blue.shade900, size: 24),
                   )
                 : const Icon(Icons.home, size: 24),
             label: 'Home',
@@ -848,7 +855,8 @@ class _ShopPageState extends State<ShopPage> {
                       color: Colors.blue.shade300,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.shopping_bag, color: Colors.blue.shade900, size: 24),
+                    child: Icon(Icons.shopping_bag,
+                        color: Colors.blue.shade900, size: 24),
                   )
                 : const Icon(Icons.shopping_bag, size: 24),
             label: 'Shop',
@@ -861,7 +869,8 @@ class _ShopPageState extends State<ShopPage> {
                       color: Colors.blue.shade300,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.camera_alt, color: Colors.blue.shade900, size: 24),
+                    child: Icon(Icons.camera_alt,
+                        color: Colors.blue.shade900, size: 24),
                   )
                 : const Icon(Icons.camera_alt, size: 24),
             label: 'Try AR',
@@ -878,7 +887,8 @@ class _ShopPageState extends State<ShopPage> {
                       color: Colors.blue.shade300,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.person, color: Colors.blue.shade900, size: 24),
+                    child: Icon(Icons.person,
+                        color: Colors.blue.shade900, size: 24),
                   )
                 : const Icon(Icons.person, size: 24),
             label: 'Profile',
@@ -890,7 +900,7 @@ class _ShopPageState extends State<ShopPage> {
 
   Widget _buildCartIcon() {
     final user = FirebaseAuth.instance.currentUser;
-    
+
     if (user == null) {
       // User not logged in, show icon without badge
       return _selectedIndex == 3
@@ -900,7 +910,8 @@ class _ShopPageState extends State<ShopPage> {
                 color: Colors.blue.shade300,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.shopping_cart_outlined, color: Colors.blue.shade900, size: 24),
+              child: Icon(Icons.shopping_cart_outlined,
+                  color: Colors.blue.shade900, size: 24),
             )
           : const Icon(Icons.shopping_cart_outlined, size: 24);
     }
@@ -910,7 +921,7 @@ class _ShopPageState extends State<ShopPage> {
       stream: _cartService.getCartItems(user.uid),
       builder: (context, snapshot) {
         final itemCount = snapshot.hasData ? snapshot.data!.length : 0;
-        
+
         final icon = _selectedIndex == 3
             ? Container(
                 padding: const EdgeInsets.all(10),
@@ -918,7 +929,8 @@ class _ShopPageState extends State<ShopPage> {
                   color: Colors.blue.shade300,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.shopping_cart_outlined, color: Colors.blue.shade900, size: 24),
+                child: Icon(Icons.shopping_cart_outlined,
+                    color: Colors.blue.shade900, size: 24),
               )
             : const Icon(Icons.shopping_cart_outlined, size: 24);
 
@@ -938,7 +950,7 @@ class _ShopPageState extends State<ShopPage> {
 
   Widget _buildNotificationIcon() {
     final user = FirebaseAuth.instance.currentUser;
-    
+
     if (user == null) {
       return IconButton(
         icon: const Icon(Icons.notifications_outlined, size: 28),

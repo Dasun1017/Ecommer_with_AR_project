@@ -8,7 +8,8 @@ class AuthService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email'],
-    serverClientId: '625706233224-5nl81cm8kihokt80c7f3st1euu25c4lk.apps.googleusercontent.com',
+    serverClientId:
+        '625706233224-5nl81cm8kihokt80c7f3st1euu25c4lk.apps.googleusercontent.com',
   );
 
   // Get current user
@@ -25,7 +26,8 @@ class AuthService {
     String role = 'client', // Default to client role
   }) async {
     try {
-      final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      final UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -46,9 +48,11 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'email-already-in-use':
-          throw Exception('This email is already registered. Please sign in instead.');
+          throw Exception(
+              'This email is already registered. Please sign in instead.');
         case 'weak-password':
-          throw Exception('Password is too weak. Please use a stronger password.');
+          throw Exception(
+              'Password is too weak. Please use a stronger password.');
         case 'invalid-email':
           throw Exception('Invalid email address.');
         case 'operation-not-allowed':
@@ -68,7 +72,8 @@ class AuthService {
     required String password,
   }) async {
     try {
-      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      final UserCredential userCredential =
+          await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -79,7 +84,8 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'user-not-found':
-          throw Exception('No account found with this email. Please sign up first.');
+          throw Exception(
+              'No account found with this email. Please sign up first.');
         case 'wrong-password':
           throw Exception('Incorrect password. Please try again.');
         case 'invalid-email':
@@ -102,14 +108,15 @@ class AuthService {
     try {
       // Trigger the authentication flow
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      
+
       if (googleUser == null) {
         // User canceled the sign-in
         return null;
       }
 
       // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
@@ -118,12 +125,16 @@ class AuthService {
       );
 
       // Sign in to Firebase with the Google credential
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
 
       if (userCredential.user != null) {
         // Check if user exists in Firestore
-        final userDoc = await _firestore.collection('users').doc(userCredential.user!.uid).get();
-        
+        final userDoc = await _firestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .get();
+
         if (!userDoc.exists) {
           // Create new user document if it doesn't exist
           final user = UserModel(
@@ -135,7 +146,7 @@ class AuthService {
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           );
-          
+
           await _firestore.collection('users').doc(user.id).set(user.toJson());
           return user;
         } else {
@@ -146,7 +157,8 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'account-exists-with-different-credential':
-          throw Exception('An account already exists with the same email but different sign-in credentials.');
+          throw Exception(
+              'An account already exists with the same email but different sign-in credentials.');
         case 'invalid-credential':
           throw Exception('The credential is malformed or has expired.');
         case 'operation-not-allowed':
@@ -199,13 +211,19 @@ class AuthService {
   // Reset password
   Future<void> resetPassword(String email) async {
     try {
-      await _auth.sendPasswordResetEmail(email: email);
+      await _auth.sendPasswordResetEmail(email: email.trim());
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'user-not-found':
-          throw Exception('No account found with this email.');
+          throw Exception(
+            'No email/password account found with this email. If you registered with Google, use Continue with Google.',
+          );
         case 'invalid-email':
           throw Exception('Invalid email address.');
+        case 'too-many-requests':
+          throw Exception('Too many reset requests. Please try again later.');
+        case 'network-request-failed':
+          throw Exception('Network error. Please check your connection.');
         default:
           throw Exception('Password reset failed: ${e.message}');
       }

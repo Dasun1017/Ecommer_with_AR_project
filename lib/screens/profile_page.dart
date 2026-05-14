@@ -5,6 +5,7 @@ import '../services/order_service.dart';
 import '../services/cart_service.dart';
 import '../models/user_model.dart';
 import '../models/order_model.dart' as models;
+import '../widgets/login_required_dialog.dart';
 import 'edit_profile_page.dart';
 import 'orders_page.dart';
 import 'order_details_page.dart';
@@ -118,9 +119,8 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           CircleAvatar(
             radius: 50,
-            backgroundImage: _user!.photoUrl != null
-                ? NetworkImage(_user!.photoUrl!)
-                : null,
+            backgroundImage:
+                _user!.photoUrl != null ? NetworkImage(_user!.photoUrl!) : null,
             child: _user!.photoUrl == null
                 ? const Icon(Icons.person, size: 50)
                 : null,
@@ -429,8 +429,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-
-
   void _logout() async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -450,11 +448,11 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
 
-    if (!context.mounted) return;
+    if (!mounted) return;
     if (confirm != true) return;
 
     await _authService.signOut();
-    if (!context.mounted) return;
+    if (!mounted) return;
     Navigator.pushReplacementNamed(context, '/login');
   }
 
@@ -471,26 +469,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   /// Show dialog prompting user to login
   void _showLoginPrompt() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Login Required'),
-        content: const Text('Please login to access this feature'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, '/login');
-            },
-            child: const Text('Login'),
-          ),
-        ],
-      ),
-    );
+    showLoginRequiredDialog(context);
   }
 
   Widget _buildBottomNavBar() {
@@ -519,7 +498,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Navigator.pushReplacementNamed(context, '/shop');
               break;
             case 2:
-              // Try AR - will be implemented later
+              Navigator.pushNamed(context, '/ar-try-on');
               break;
             case 3:
               // Cart - requires authentication
@@ -550,7 +529,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: Colors.blue.shade300,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.home, color: Colors.blue.shade900, size: 24),
+                    child:
+                        Icon(Icons.home, color: Colors.blue.shade900, size: 24),
                   )
                 : const Icon(Icons.home, size: 24),
             label: 'Home',
@@ -563,7 +543,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: Colors.blue.shade300,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.shopping_bag, color: Colors.blue.shade900, size: 24),
+                    child: Icon(Icons.shopping_bag,
+                        color: Colors.blue.shade900, size: 24),
                   )
                 : const Icon(Icons.shopping_bag, size: 24),
             label: 'Shop',
@@ -576,7 +557,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: Colors.blue.shade300,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.camera_alt, color: Colors.blue.shade900, size: 24),
+                    child: Icon(Icons.camera_alt,
+                        color: Colors.blue.shade900, size: 24),
                   )
                 : const Icon(Icons.camera_alt, size: 24),
             label: 'Try AR',
@@ -593,7 +575,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: Colors.blue.shade300,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.person, color: Colors.blue.shade900, size: 24),
+                    child: Icon(Icons.person,
+                        color: Colors.blue.shade900, size: 24),
                   )
                 : const Icon(Icons.person, size: 24),
             label: 'Profile',
@@ -605,7 +588,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildCartIcon() {
     final user = FirebaseAuth.instance.currentUser;
-    
+
     if (user == null) {
       // User not logged in, show icon without badge
       return _selectedIndex == 3
@@ -615,7 +598,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 color: Colors.blue.shade300,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.shopping_cart_outlined, color: Colors.blue.shade900, size: 24),
+              child: Icon(Icons.shopping_cart_outlined,
+                  color: Colors.blue.shade900, size: 24),
             )
           : const Icon(Icons.shopping_cart_outlined, size: 24);
     }
@@ -625,7 +609,7 @@ class _ProfilePageState extends State<ProfilePage> {
       stream: _cartService.getCartItems(user.uid),
       builder: (context, snapshot) {
         final itemCount = snapshot.hasData ? snapshot.data!.length : 0;
-        
+
         final icon = _selectedIndex == 3
             ? Container(
                 padding: const EdgeInsets.all(10),
@@ -633,7 +617,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   color: Colors.blue.shade300,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.shopping_cart_outlined, color: Colors.blue.shade900, size: 24),
+                child: Icon(Icons.shopping_cart_outlined,
+                    color: Colors.blue.shade900, size: 24),
               )
             : const Icon(Icons.shopping_cart_outlined, size: 24);
 

@@ -17,12 +17,12 @@ import '../models/product_model.dart';
 class ARTryOnPage extends StatefulWidget {
   const ARTryOnPage({
     super.key,
-    required this.product,
+    this.product,
     this.cartItems = const [],
     this.selectedSize,
   });
 
-  final Product product;
+  final Product? product;
   final List<CartItem> cartItems;
   final String? selectedSize;
 
@@ -47,7 +47,7 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
   bool _isControlsCollapsed = false;
   String? _errorMessage;
   String? _modelLoadError;
-  late final String _modelSource;
+  late final String? _modelSource;
   late double _fitScale;
   double _verticalOffset = 0;
   DateTime _lastProcessedAt = DateTime.fromMillisecondsSinceEpoch(0);
@@ -55,7 +55,9 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
   @override
   void initState() {
     super.initState();
-    _modelSource = ArProductModelResolver.resolve(widget.product);
+    _modelSource = widget.product == null
+        ? null
+        : ArProductModelResolver.resolve(widget.product!);
     _fitScale = _defaultFitScaleForSize(widget.selectedSize);
     unawaited(_initializeTryOn());
   }
@@ -175,8 +177,8 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
               pose: pose,
               sourceSize: processedFrame.imageSize,
               viewportSize: _previewViewportSize,
-              mirrorHorizontally:
-                  _cameraDescription!.lensDirection == CameraLensDirection.front,
+              mirrorHorizontally: _cameraDescription!.lensDirection ==
+                  CameraLensDirection.front,
               fitScale: _fitScale,
               verticalOffset: _verticalOffset,
             );
@@ -212,7 +214,7 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: const Text('AR Try On'),
+        title: Text(widget.product == null ? 'Body Detection' : 'AR Try On'),
       ),
       body: _buildBody(),
     );
@@ -258,32 +260,36 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
               controller: cameraController,
               renderSize: renderSize,
             ),
-            _buildModelOverlay(),
+            widget.product == null
+                ? _buildBodyDetectionOverlay()
+                : _buildModelOverlay(),
             _buildTopInfo(),
-            ArTryOnControls(
-              productName: widget.product.name,
-              selectedSize: widget.selectedSize,
-              cartCount: widget.cartItems.length,
-              fitScale: _fitScale,
-              verticalOffset: _verticalOffset,
-              isPoseDetected: _isPoseDetected,
-              isCollapsed: _isControlsCollapsed,
-              onToggleCollapsed: () {
-                setState(() {
-                  _isControlsCollapsed = !_isControlsCollapsed;
-                });
-              },
-              onFitScaleChanged: (value) {
-                setState(() {
-                  _fitScale = value;
-                });
-              },
-              onVerticalOffsetChanged: (value) {
-                setState(() {
-                  _verticalOffset = value;
-                });
-              },
-            ),
+            widget.product == null
+                ? _buildBodyDetectionPanel()
+                : ArTryOnControls(
+                    productName: widget.product!.name,
+                    selectedSize: widget.selectedSize,
+                    cartCount: widget.cartItems.length,
+                    fitScale: _fitScale,
+                    verticalOffset: _verticalOffset,
+                    isPoseDetected: _isPoseDetected,
+                    isCollapsed: _isControlsCollapsed,
+                    onToggleCollapsed: () {
+                      setState(() {
+                        _isControlsCollapsed = !_isControlsCollapsed;
+                      });
+                    },
+                    onFitScaleChanged: (value) {
+                      setState(() {
+                        _fitScale = value;
+                      });
+                    },
+                    onVerticalOffsetChanged: (value) {
+                      setState(() {
+                        _verticalOffset = value;
+                      });
+                    },
+                  ),
           ],
         );
       },
@@ -292,7 +298,8 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
 
   Widget _buildModelOverlay() {
     final overlayData = _overlayData;
-    if (overlayData == null) {
+    final modelSource = _modelSource;
+    if (overlayData == null || modelSource == null) {
       return const SizedBox.shrink();
     }
 
@@ -305,7 +312,7 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
             opacity: overlayData.confidence.clamp(0.45, 1.0),
             child: Flutter3DViewer(
               controller: _modelController,
-              src: _modelSource,
+              src: modelSource,
               enableTouch: false,
               progressBarColor: Colors.transparent,
               onLoad: (_) {
@@ -324,6 +331,52 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
                   _modelLoadError = error;
                 });
               },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBodyDetectionOverlay() {
+    final overlayData = _overlayData;
+    if (overlayData == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Positioned.fromRect(
+      rect: overlayData.frame,
+      child: IgnorePointer(
+        child: Transform.rotate(
+          angle: overlayData.rotation,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.blue.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: Colors.blueAccent.withValues(alpha: 0.9),
+                width: 3,
+              ),
+            ),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                margin: const EdgeInsets.only(top: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.blueAccent.withValues(alpha: 0.86),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: const Text(
+                  'Body detected',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
             ),
           ),
         ),
@@ -350,13 +403,71 @@ class _ARTryOnPageState extends State<ARTryOnPage> {
               Expanded(
                 child: Text(
                   _modelLoadError == null
-                      ? 'Center your shoulders and hips in frame to place the outfit.'
+                      ? widget.product == null
+                          ? 'Stand in frame so your shoulders and hips are visible.'
+                          : 'Center your shoulders and hips in frame to place the outfit.'
                       : '3D model could not load. Check the model file for this product.',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBodyDetectionPanel() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.all(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.82),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                _isPoseDetected
+                    ? Icons.accessibility_new
+                    : Icons.center_focus_strong,
+                color:
+                    _isPoseDetected ? Colors.greenAccent : Colors.orangeAccent,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _isPoseDetected ? 'Body detected' : 'Scanning body',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _isPoseDetected
+                          ? 'Pose locked. Keep your shoulders and hips visible.'
+                          : 'Move back slightly and keep your full upper body in view.',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

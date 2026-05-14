@@ -2,10 +2,8 @@
 
 import 'package:flutter/material.dart';
 import '../services/order_service.dart';
-import '../services/cart_service.dart';
 import '../services/auth_service.dart';
 import '../models/cart_item_model.dart';
-import '../models/order_model.dart' as models;
 import '../utils/notification_helper.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -23,17 +21,18 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
+  static const double _deliveryFee = 350.0;
+
   final OrderService _orderService = OrderService();
-  final CartService _cartService = CartService();
   final AuthService _authService = AuthService();
-  
+
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
   final _zipController = TextEditingController();
-  
+
   String _paymentMethod = 'card';
   bool _isProcessing = false;
 
@@ -67,6 +66,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildOrderSummary() {
+    final subtotal =
+        widget.items.fold<double>(0, (total, item) => total + item.totalPrice);
+    final total = subtotal + _deliveryFee;
+
     return Card(
       margin: const EdgeInsets.all(16),
       child: Padding(
@@ -83,24 +86,35 @@ class _CheckoutPageState extends State<CheckoutPage> {
             ),
             const SizedBox(height: 12),
             ...widget.items.map((item) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      '${item.productName} x${item.quantity}',
-                      style: const TextStyle(fontSize: 14),
-                    ),
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '${item.productName} x${item.quantity}',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      Text(
+                        'Rs. ${item.totalPrice.toStringAsFixed(2)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  Text(
-                    'Rs. ${item.totalPrice.toStringAsFixed(2)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            )),
+                )),
             const Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Delivery'),
+                Text(
+                  'Rs. ${_deliveryFee.toStringAsFixed(2)}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -112,7 +126,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                 ),
                 Text(
-                  'Rs. ${widget.total.toStringAsFixed(2)}',
+                  'Rs. ${total.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -286,6 +300,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildPlaceOrderButton() {
+    final subtotal =
+        widget.items.fold<double>(0, (total, item) => total + item.totalPrice);
+    final total = subtotal + _deliveryFee;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -316,7 +334,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                 )
               : Text(
-                  'Place Order - Rs. ${widget.total.toStringAsFixed(2)}',
+                  'Place Order - Rs. ${total.toStringAsFixed(2)}',
                   style: const TextStyle(fontSize: 16),
                 ),
         ),
@@ -326,6 +344,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   void _placeOrder() async {
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (widget.items.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Your cart is empty')),
+      );
       return;
     }
 
@@ -345,43 +370,32 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
 
     final shippingAddress = '''
-${_nameController.text}
-${_phoneController.text}
-${_addressController.text}
-${_cityController.text}, ${_zipController.text}
+${_nameController.text.trim()}
+${_phoneController.text.trim()}
+${_addressController.text.trim()}
+${_cityController.text.trim()}, ${_zipController.text.trim()}
 ''';
 
-    final order = models.Order(
-      id: '', // Will be set by Firestore
-      userId: userId,
-      items: widget.items.map((item) => models.OrderItem(
-        productId: item.productId,
-        productName: item.productName,
-        productImage: item.productImage,
-        price: item.price,
-        quantity: item.quantity,
-        selectedColor: item.selectedColor,
-        selectedSize: item.selectedSize,
-      )).toList(),
-      totalAmount: widget.total,
-      status: models.OrderStatus.pending,
-      shippingAddress: shippingAddress,
-      paymentMethod: _paymentMethod,
-      createdAt: DateTime.now(),
-    );
-
     try {
-      final orderId = await _orderService.createOrder(order);
-      await _cartService.clearCart(userId);
-      
-      // Send order placed notification with the actual Firestore document ID
-      await NotificationHelper.sendOrderPlacedNotification(
-        userId,
-        orderId,
-        widget.total,
+      final placedOrder = await _orderService.placeOrderFromCart(
+        userId: userId,
+        shippingAddress: shippingAddress,
+        paymentMethod: _paymentMethod,
+        deliveryFee: _deliveryFee,
       );
 
-      if (!context.mounted) return;
+      try {
+        // Send order placed notification with the actual Firestore document ID.
+        await NotificationHelper.sendOrderPlacedNotification(
+          userId,
+          placedOrder.orderId,
+          placedOrder.totalAmount,
+        );
+      } catch (notificationError) {
+        debugPrint('Order placed, but notification failed: $notificationError');
+      }
+
+      if (!mounted) return;
       setState(() {
         _isProcessing = false;
       });
@@ -404,11 +418,11 @@ ${_cityController.text}, ${_zipController.text}
         ),
       );
     } catch (e) {
-      if (context.mounted) {
+      if (mounted) {
         setState(() {
           _isProcessing = false;
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error placing order: $e')),
         );

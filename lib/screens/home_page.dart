@@ -4,6 +4,7 @@ import '../services/product_service.dart';
 import '../services/cart_service.dart';
 import '../services/notification_service.dart';
 import '../models/product_model.dart';
+import '../widgets/login_required_dialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -38,14 +39,16 @@ class _HomePageState extends State<HomePage> {
     try {
       // Use .first to get the first emission from the stream
       final products = await _productService.getAllProducts().first;
-      
+
       setState(() {
         // Get featured products
-        _featuredProducts = products.where((p) => p.isFeatured).take(6).toList();
-        
+        _featuredProducts =
+            products.where((p) => p.isFeatured).take(6).toList();
+
         // Get products with good ratings as deals
-        _dealsProducts = products.where((p) => p.rating >= 4.0).take(4).toList();
-        
+        _dealsProducts =
+            products.where((p) => p.rating >= 4.0).take(4).toList();
+
         _isLoadingProducts = false;
       });
     } catch (e) {
@@ -71,26 +74,7 @@ class _HomePageState extends State<HomePage> {
 
   /// Show dialog prompting user to login
   void _showLoginPrompt() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Login Required'),
-        content: const Text('Please login to access this feature'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, '/login');
-            },
-            child: const Text('Login'),
-          ),
-        ],
-      ),
-    );
+    showLoginRequiredDialog(context);
   }
 
   @override
@@ -230,7 +214,8 @@ class _HomePageState extends State<HomePage> {
               InkWell(
                 onTap: _showSortOptions,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(6),
@@ -243,7 +228,8 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(fontSize: 13),
                       ),
                       const SizedBox(width: 4),
-                      Icon(Icons.swap_vert, size: 18, color: Colors.grey.shade700),
+                      Icon(Icons.swap_vert,
+                          size: 18, color: Colors.grey.shade700),
                     ],
                   ),
                 ),
@@ -252,7 +238,8 @@ class _HomePageState extends State<HomePage> {
               InkWell(
                 onTap: _showFilterOptions,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(6),
@@ -265,7 +252,8 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(fontSize: 13),
                       ),
                       const SizedBox(width: 4),
-                      Icon(Icons.filter_list, size: 18, color: Colors.grey.shade700),
+                      Icon(Icons.filter_list,
+                          size: 18, color: Colors.grey.shade700),
                     ],
                   ),
                 ),
@@ -401,7 +389,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: (category['color'] as MaterialColor).withValues(alpha: 0.3),
+                            color: (category['color'] as MaterialColor)
+                                .withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -440,7 +429,8 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.all(16),
       child: GestureDetector(
         onTap: () {
-          Navigator.pushNamed(context, '/products', arguments: {'filter': 'deals'});
+          Navigator.pushNamed(context, '/products',
+              arguments: {'filter': 'deals'});
         },
         child: Container(
           // Let the container size itself to the FittedBox content — no fixed height
@@ -585,7 +575,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         SizedBox(
-          height: (MediaQuery.of(context).size.height * 0.30).clamp(190.0, 290.0),
+          height:
+              (MediaQuery.of(context).size.height * 0.30).clamp(190.0, 290.0),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -740,9 +731,11 @@ class _HomePageState extends State<HomePage> {
             crossAxisCount: 2,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 0.62, // taller cards — more room for text below image
+            childAspectRatio:
+                0.62, // taller cards — more room for text below image
           ),
-          itemCount: _featuredProducts.length > 4 ? 4 : _featuredProducts.length,
+          itemCount:
+              _featuredProducts.length > 4 ? 4 : _featuredProducts.length,
           itemBuilder: (context, index) {
             return _buildFeaturedProductCard(_featuredProducts[index]);
           },
@@ -898,7 +891,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.pushReplacementNamed(context, '/shop');
               break;
             case 2:
-              // Try AR - will be implemented later
+              Navigator.pushNamed(context, '/ar-try-on');
               break;
             case 3:
               // Cart - requires authentication
@@ -932,7 +925,8 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.blue.shade300,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.home, color: Colors.blue.shade900, size: 24),
+                    child:
+                        Icon(Icons.home, color: Colors.blue.shade900, size: 24),
                   )
                 : const Icon(Icons.home, size: 24),
             label: 'Home',
@@ -945,7 +939,8 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.blue.shade300,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.shopping_bag, color: Colors.blue.shade900, size: 24),
+                    child: Icon(Icons.shopping_bag,
+                        color: Colors.blue.shade900, size: 24),
                   )
                 : const Icon(Icons.shopping_bag, size: 24),
             label: 'Shop',
@@ -958,7 +953,8 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.blue.shade300,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.camera_alt, color: Colors.blue.shade900, size: 24),
+                    child: Icon(Icons.camera_alt,
+                        color: Colors.blue.shade900, size: 24),
                   )
                 : const Icon(Icons.camera_alt, size: 24),
             label: 'Try AR',
@@ -975,7 +971,8 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.blue.shade300,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.person, color: Colors.blue.shade900, size: 24),
+                    child: Icon(Icons.person,
+                        color: Colors.blue.shade900, size: 24),
                   )
                 : const Icon(Icons.person, size: 24),
             label: 'Profile',
@@ -987,7 +984,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildCartIcon() {
     final user = FirebaseAuth.instance.currentUser;
-    
+
     if (user == null) {
       // User not logged in, show icon without badge
       return _selectedIndex == 3
@@ -997,7 +994,8 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.blue.shade300,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.shopping_cart_outlined, color: Colors.blue.shade900, size: 24),
+              child: Icon(Icons.shopping_cart_outlined,
+                  color: Colors.blue.shade900, size: 24),
             )
           : const Icon(Icons.shopping_cart_outlined, size: 24);
     }
@@ -1007,7 +1005,7 @@ class _HomePageState extends State<HomePage> {
       stream: _cartService.getCartItems(user.uid),
       builder: (context, snapshot) {
         final itemCount = snapshot.hasData ? snapshot.data!.length : 0;
-        
+
         final icon = _selectedIndex == 3
             ? Container(
                 padding: const EdgeInsets.all(10),
@@ -1015,7 +1013,8 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.blue.shade300,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.shopping_cart_outlined, color: Colors.blue.shade900, size: 24),
+                child: Icon(Icons.shopping_cart_outlined,
+                    color: Colors.blue.shade900, size: 24),
               )
             : const Icon(Icons.shopping_cart_outlined, size: 24);
 
@@ -1035,7 +1034,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildNotificationIcon() {
     final user = FirebaseAuth.instance.currentUser;
-    
+
     if (user == null) {
       return IconButton(
         icon: const Icon(Icons.notifications_outlined, size: 28),
@@ -1071,5 +1070,4 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-
 }

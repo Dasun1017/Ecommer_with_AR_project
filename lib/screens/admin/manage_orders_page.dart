@@ -48,9 +48,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
           // Orders list
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: _firestore
-                  .collection('orders')
-                  .snapshots(),
+              stream: _firestore.collection('orders').snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
@@ -124,18 +122,21 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
                 }
 
                 try {
-                  var orders = snapshot.data!.docs.map((doc) {
-                    try {
-                      final data = doc.data() as Map<String, dynamic>;
-                      // ALWAYS use the Firestore document ID, override any existing 'id' field
-                      data['id'] = doc.id;
-                      return order_model.Order.fromJson(data);
-                    } catch (e) {
-                      // Log error for this specific document and skip it
-                      debugPrint('Error parsing order ${doc.id}: $e');
-                      return null;
-                    }
-                  }).whereType<order_model.Order>().toList(); // Filter out null values
+                  var orders = snapshot.data!.docs
+                      .map((doc) {
+                        try {
+                          final data = doc.data() as Map<String, dynamic>;
+                          // ALWAYS use the Firestore document ID, override any existing 'id' field
+                          data['id'] = doc.id;
+                          return order_model.Order.fromJson(data);
+                        } catch (e) {
+                          // Log error for this specific document and skip it
+                          debugPrint('Error parsing order ${doc.id}: $e');
+                          return null;
+                        }
+                      })
+                      .whereType<order_model.Order>()
+                      .toList(); // Filter out null values
 
                   if (orders.isEmpty) {
                     return Center(
@@ -174,8 +175,10 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
                   // Filter by status
                   if (_selectedStatus != 'All') {
                     orders = orders.where((order) {
-                      final statusString = order.status.toString().split('.').last;
-                      return statusString.toLowerCase() == _selectedStatus.toLowerCase();
+                      final statusString =
+                          order.status.toString().split('.').last;
+                      return statusString.toLowerCase() ==
+                          _selectedStatus.toLowerCase();
                     }).toList();
                   }
 
@@ -332,7 +335,8 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
                       border: Border.all(color: statusColor),
                     ),
                     child: Text(
-                      statusString.replaceFirst(statusString[0], statusString[0].toUpperCase()),
+                      statusString.replaceFirst(
+                          statusString[0], statusString[0].toUpperCase()),
                       style: TextStyle(
                         color: statusColor,
                         fontWeight: FontWeight.bold,
@@ -363,7 +367,8 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                  const Icon(Icons.calendar_today,
+                      size: 16, color: Colors.grey),
                   const SizedBox(width: 8),
                   Text(
                     _formatDate(order.createdAt),
@@ -426,7 +431,8 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Order #${order.id.length > 8 ? order.id.substring(0, 8) : order.id}'),
+        title: Text(
+            'Order #${order.id.length > 8 ? order.id.substring(0, 8) : order.id}'),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -434,11 +440,15 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
             children: [
               _buildDetailRow('Order ID', order.id),
               const SizedBox(height: 8),
-              _buildDetailRow('Status', statusString.replaceFirst(statusString[0], statusString[0].toUpperCase())),
+              _buildDetailRow(
+                  'Status',
+                  statusString.replaceFirst(
+                      statusString[0], statusString[0].toUpperCase())),
               const SizedBox(height: 8),
               _buildDetailRow('Date', _formatDate(order.createdAt)),
               const SizedBox(height: 8),
-              _buildDetailRow('Total', 'LKR ${order.totalAmount.toStringAsFixed(2)}'),
+              _buildDetailRow(
+                  'Total', 'LKR ${order.totalAmount.toStringAsFixed(2)}'),
               const SizedBox(height: 8),
               _buildDetailRow('Payment', order.paymentMethod ?? 'N/A'),
               const Divider(height: 24),
@@ -500,10 +510,11 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
 
   void _showUpdateStatusDialog(order_model.Order order) {
     order_model.OrderStatus newStatus = order.status;
+    final pageContext = context;
 
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+      context: pageContext,
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Update Order Status'),
         content: StatefulBuilder(
           builder: (context, setDialogState) {
@@ -578,15 +589,15 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () async {
               try {
                 // Show loading indicator
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                if (pageContext.mounted) {
+                  ScaffoldMessenger.of(pageContext).showSnackBar(
                     const SnackBar(
                       content: Text('Updating order status...'),
                       duration: Duration(seconds: 1),
@@ -597,16 +608,19 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
                 debugPrint('Attempting to update order with ID: ${order.id}');
 
                 // First check if document exists
-                final docSnapshot = await _firestore.collection('orders').doc(order.id).get();
-                
+                final docSnapshot =
+                    await _firestore.collection('orders').doc(order.id).get();
+
                 if (!docSnapshot.exists) {
                   debugPrint('Document not found! Checking all documents...');
-                  
+
                   // List all document IDs for debugging
                   final allDocs = await _firestore.collection('orders').get();
-                  debugPrint('Available order IDs: ${allDocs.docs.map((d) => d.id).join(", ")}');
-                  
-                  throw Exception('Order document not found in Firestore.\nLooking for: ${order.id}\nPlease check the console for available IDs.');
+                  debugPrint(
+                      'Available order IDs: ${allDocs.docs.map((d) => d.id).join(", ")}');
+
+                  throw Exception(
+                      'Order document not found in Firestore.\nLooking for: ${order.id}\nPlease check the console for available IDs.');
                 }
 
                 // Update the status
@@ -620,12 +634,13 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
                   newStatus,
                 );
 
-                
                 debugPrint('Successfully updated order ${order.id}');
 
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
+                if (pageContext.mounted) {
+                  if (dialogContext.mounted) {
+                    Navigator.pop(dialogContext);
+                  }
+                  ScaffoldMessenger.of(pageContext).showSnackBar(
                     const SnackBar(
                       content: Text('Order status updated successfully'),
                       backgroundColor: Colors.green,
@@ -634,16 +649,18 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
                 }
               } catch (e) {
                 debugPrint('Error updating order: $e');
-                if (context.mounted) {
-                  Navigator.pop(context);
+                if (pageContext.mounted) {
+                  if (dialogContext.mounted) {
+                    Navigator.pop(dialogContext);
+                  }
                   showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
+                    context: pageContext,
+                    builder: (errorContext) => AlertDialog(
                       title: const Text('Error'),
                       content: Text('Failed to update order status:\n\n$e'),
                       actions: [
                         TextButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () => Navigator.pop(errorContext),
                           child: const Text('OK'),
                         ),
                       ],
@@ -667,27 +684,32 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
     try {
       String title = '';
       String body = '';
-      
+
       switch (newStatus) {
         case order_model.OrderStatus.pending:
           title = 'Order Status: Pending';
-          body = 'Your order #${orderId.substring(0, 8)} is pending confirmation.';
+          body =
+              'Your order #${orderId.substring(0, 8)} is pending confirmation.';
           break;
         case order_model.OrderStatus.confirmed:
           title = 'Order Confirmed! 🎉';
-          body = 'Your order #${orderId.substring(0, 8)} has been confirmed and will be processed soon.';
+          body =
+              'Your order #${orderId.substring(0, 8)} has been confirmed and will be processed soon.';
           break;
         case order_model.OrderStatus.processing:
           title = 'Order Processing 📦';
-          body = 'Your order #${orderId.substring(0, 8)} is being prepared for shipment.';
+          body =
+              'Your order #${orderId.substring(0, 8)} is being prepared for shipment.';
           break;
         case order_model.OrderStatus.shipped:
           title = 'Order Shipped! 🚚';
-          body = 'Great news! Your order #${orderId.substring(0, 8)} has been shipped and is on its way to you.';
+          body =
+              'Great news! Your order #${orderId.substring(0, 8)} has been shipped and is on its way to you.';
           break;
         case order_model.OrderStatus.delivered:
           title = 'Order Delivered! ✅';
-          body = 'Your order #${orderId.substring(0, 8)} has been successfully delivered. Thank you for shopping with us!';
+          body =
+              'Your order #${orderId.substring(0, 8)} has been successfully delivered. Thank you for shopping with us!';
           break;
         case order_model.OrderStatus.cancelled:
           title = 'Order Cancelled ❌';
