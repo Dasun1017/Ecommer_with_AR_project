@@ -1,4 +1,4 @@
-# E-Commerce AR Shopping App
+# E-Commerce AR Shopping App 2
 
 A modern mobile e-commerce application built with Flutter and Firebase, featuring Augmented Reality (AR) product visualization.
 
@@ -29,12 +29,16 @@ A modern mobile e-commerce application built with Flutter and Firebase, featurin
 
 ```
 lib/
+├── features/         # Feature-based modules
 ├── models/           # Data models
 ├── screens/          # UI screens
 ├── services/         # Business logic and API calls
 ├── utils/            # Utilities and helpers
+├── auth_wrapper.dart # Authentication state wrapper
 ├── firebase_options.dart
 └── main.dart
+scripts/
+└── populate_db.py    # Database population script
 ```
 
 ## Setup Instructions
@@ -45,12 +49,14 @@ lib/
 - Dart SDK (3.0.0 or higher)
 - Android Studio / VS Code
 - Firebase account
+- Python 3.x (for database population script)
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   cd "d:\final project\Test 02\Ecommer_with_AR_project"
+   git clone <repository-url>
+   cd Ecommer_with_AR_project_2
    ```
 
 2. **Install dependencies**
@@ -60,17 +66,33 @@ lib/
 
 3. **Configure Firebase**
    - Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
-   - Download `google-services.json` for Android and place it in `android/app/`
+   - You can use the FlutterFire CLI for easy configuration:
+     ```bash
+     dart pub global activate flutterfire_cli
+     flutterfire configure
+     ```
+   - Alternatively, download `google-services.json` for Android and place it in `android/app/`
    - Download `GoogleService-Info.plist` for iOS and place it in `ios/Runner/`
-   - Update `lib/firebase_options.dart` with your Firebase configuration
 
 4. **Enable Firebase Services**
    - Authentication (Email/Password, Google)
    - Cloud Firestore
    - Firebase Storage
-   - Cloud Messaging
 
-5. **Run the app**
+5. **Populate the Database (Optional but recommended for testing)**
+   To use the provided product mock data:
+   - Go to your Firebase Console -> Project Settings -> Service Accounts.
+   - Click "Generate new private key" to download your service account JSON file.
+   - Save the file as `serviceAccountKey.json` in the root of the project.
+   - Create a virtual environment, install the required Python packages, and run the populate script:
+     ```bash
+     python3 -m venv venv
+     source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+     pip install firebase-admin
+     python3 scripts/populate_db.py --service-account serviceAccountKey.json
+     ```
+
+6. **Run the app**
    ```bash
    flutter run
    ```

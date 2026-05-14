@@ -53,6 +53,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/logo/
+    - assets/3d_models/
 
   # fonts:
   #   - family: CustomFont

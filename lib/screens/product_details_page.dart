@@ -59,15 +59,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   Future<void> _goToARTryOn() async {
     final userId = _authService.currentUser?.uid;
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please login first')),
-      );
-      return;
-    }
-
+    
     try {
-      final cartItems = await _cartService.getCartItems(userId).first;
+      final cartItems = userId != null ? await _cartService.getCartItems(userId).first : <CartItem>[];
       if (!context.mounted) return;
       Navigator.push(
         context,
