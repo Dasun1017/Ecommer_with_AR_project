@@ -1,11 +1,15 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user_model.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email'],
     serverClientId:
@@ -191,8 +195,36 @@ class AuthService {
   Future<void> updateUserProfile(UserModel user) async {
     try {
       await _firestore.collection('users').doc(user.id).update(user.toJson());
+
+      if (_auth.currentUser?.uid == user.id) {
+        await _auth.currentUser?.updateDisplayName(user.name);
+        await _auth.currentUser?.updatePhotoURL(user.photoUrl);
+      }
     } catch (e) {
       throw Exception('Failed to update user profile: $e');
+    }
+  }
+
+  Future<String> uploadUserProfileImage({
+    required String userId,
+    required File imageFile,
+  }) async {
+    try {
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final ref = _storage
+          .ref()
+          .child('user_profile_photos')
+          .child(userId)
+          .child('profile_$timestamp.jpg');
+
+      await ref.putFile(
+        imageFile,
+        SettableMetadata(contentType: 'image/jpeg'),
+      );
+
+      return await ref.getDownloadURL();
+    } catch (e) {
+      throw Exception('Failed to upload profile photo: $e');
     }
   }
 

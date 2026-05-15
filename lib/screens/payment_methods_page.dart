@@ -8,126 +8,125 @@ class PaymentMethodsPage extends StatefulWidget {
 }
 
 class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
-  // Mock payment methods - in production, this would come from a database
   final List<PaymentMethod> _paymentMethods = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Payment Methods'),
-        backgroundColor: Colors.green[700],
-        foregroundColor: Colors.white,
-      ),
+      backgroundColor: Colors.grey.shade50,
+      appBar: AppBar(title: const Text('Payment Methods')),
       body: _paymentMethods.isEmpty
           ? _buildEmptyState()
           : _buildPaymentMethodsList(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddPaymentMethodDialog,
-        backgroundColor: Colors.green[700],
+        backgroundColor: Colors.blue.shade700,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
-        label: const Text('Add Payment Method'),
+        label: const Text('Add Method'),
       ),
     );
   }
 
   Widget _buildEmptyState() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.credit_card_off,
-            size: 80,
-            color: Colors.grey[400],
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade200),
           ),
-          const SizedBox(height: 16),
-          Text(
-            'No Payment Methods',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[700],
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.credit_card_off,
+                  size: 68, color: Colors.blue.shade700),
+              const SizedBox(height: 16),
+              Text(
+                'No Payment Methods',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Add a payment method to make checkout faster',
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 22),
+              ElevatedButton.icon(
+                onPressed: _showAddPaymentMethodDialog,
+                icon: const Icon(Icons.add),
+                label: const Text('Add Payment Method'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade700,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Add a payment method to make checkout faster',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: _showAddPaymentMethodDialog,
-            icon: const Icon(Icons.add),
-            label: const Text('Add Payment Method'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green[700],
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildPaymentMethodsList() {
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
       itemCount: _paymentMethods.length,
       itemBuilder: (context, index) {
-        final method = _paymentMethods[index];
-        return _buildPaymentMethodCard(method, index);
+        return _buildPaymentMethodCard(_paymentMethods[index], index);
       },
     );
   }
 
   Widget _buildPaymentMethodCard(PaymentMethod method, int index) {
-    IconData icon;
-    Color color;
+    final icon = switch (method.type) {
+      PaymentType.creditCard => Icons.credit_card,
+      PaymentType.debitCard => Icons.payment,
+      PaymentType.bankAccount => Icons.account_balance,
+      PaymentType.digitalWallet => Icons.wallet,
+    };
+    final color = switch (method.type) {
+      PaymentType.creditCard => Colors.blue,
+      PaymentType.debitCard => Colors.teal,
+      PaymentType.bankAccount => Colors.purple,
+      PaymentType.digitalWallet => Colors.orange,
+    };
 
-    switch (method.type) {
-      case PaymentType.creditCard:
-        icon = Icons.credit_card;
-        color = Colors.blue;
-        break;
-      case PaymentType.debitCard:
-        icon = Icons.payment;
-        color = Colors.green;
-        break;
-      case PaymentType.bankAccount:
-        icon = Icons.account_balance;
-        color = Colors.purple;
-        break;
-      case PaymentType.digitalWallet:
-        icon = Icons.wallet;
-        color = Colors.orange;
-        break;
-    }
-
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
-        leading: CircleAvatar(
-          backgroundColor: color.withValues(alpha: 0.2),
+        leading: Container(
+          height: 42,
+          width: 42,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          alignment: Alignment.center,
           child: Icon(icon, color: color),
         ),
         title: Text(
           method.name,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,17 +134,17 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
             const SizedBox(height: 4),
             Text(method.maskedNumber),
             if (method.isDefault) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.blue.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
+                child: Text(
                   'DEFAULT',
                   style: TextStyle(
-                    color: Colors.green,
+                    color: Colors.blue.shade700,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
@@ -216,18 +215,26 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
-          return AlertDialog(
-            title: const Text('Add Payment Method'),
-            content: SingleChildScrollView(
+          return Dialog(
+            insetPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  _buildDialogHeader(
+                    icon: Icons.add_card_outlined,
+                    title: 'Add Payment Method',
+                    color: Colors.blue.shade700,
+                  ),
+                  const SizedBox(height: 18),
                   DropdownButtonFormField<PaymentType>(
                     initialValue: selectedType,
-                    decoration: const InputDecoration(
-                      labelText: 'Payment Type',
-                      border: OutlineInputBorder(),
-                    ),
+                    decoration: _fieldDecoration('Payment Type'),
                     items: PaymentType.values.map((type) {
                       return DropdownMenuItem(
                         value: type,
@@ -235,69 +242,65 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                       );
                     }).toList(),
                     onChanged: (value) {
-                      if (value != null) {
-                        setDialogState(() {
-                          selectedType = value;
-                        });
-                      }
+                      if (value == null) return;
+                      setDialogState(() {
+                        selectedType = value;
+                      });
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   TextField(
                     controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name on Card/Account',
-                      border: OutlineInputBorder(),
-                    ),
+                    decoration: _fieldDecoration('Name on Card/Account'),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   TextField(
                     controller: numberController,
-                    decoration: const InputDecoration(
-                      labelText: 'Card/Account Number',
-                      border: OutlineInputBorder(),
-                    ),
+                    decoration: _fieldDecoration('Card/Account Number'),
                     keyboardType: TextInputType.number,
                     maxLength: 16,
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (nameController.text.isEmpty ||
+                            numberController.text.isEmpty) {
+                          return;
+                        }
+
+                        setState(() {
+                          _paymentMethods.add(
+                            PaymentMethod(
+                              type: selectedType,
+                              name: nameController.text,
+                              maskedNumber: _maskNumber(numberController.text),
+                              isDefault: _paymentMethods.isEmpty,
+                            ),
+                          );
+                        });
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Payment method added successfully'),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade700,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Add'),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel'),
                   ),
                 ],
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (nameController.text.isNotEmpty &&
-                      numberController.text.isNotEmpty) {
-                    setState(() {
-                      _paymentMethods.add(
-                        PaymentMethod(
-                          type: selectedType,
-                          name: nameController.text,
-                          maskedNumber: _maskNumber(numberController.text),
-                          isDefault: _paymentMethods.isEmpty,
-                        ),
-                      );
-                    });
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Payment method added successfully'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Add'),
-              ),
-            ],
           );
         },
       ),
@@ -309,48 +312,91 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Payment Method'),
-        content: TextField(
-          controller: nameController,
-          decoration: const InputDecoration(
-            labelText: 'Name on Card/Account',
-            border: OutlineInputBorder(),
+      builder: (context) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildDialogHeader(
+                icon: Icons.edit_outlined,
+                title: 'Edit Payment Method',
+                color: Colors.blue.shade700,
+              ),
+              const SizedBox(height: 18),
+              TextField(
+                controller: nameController,
+                decoration: _fieldDecoration('Name on Card/Account'),
+              ),
+              const SizedBox(height: 18),
+              ElevatedButton(
+                onPressed: () {
+                  if (nameController.text.isEmpty) return;
+
+                  setState(() {
+                    _paymentMethods[index] = PaymentMethod(
+                      type: method.type,
+                      name: nameController.text,
+                      maskedNumber: method.maskedNumber,
+                      isDefault: method.isDefault,
+                    );
+                  });
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Payment method updated')),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade700,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Update'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (nameController.text.isNotEmpty) {
-                setState(() {
-                  _paymentMethods[index] = PaymentMethod(
-                    type: method.type,
-                    name: nameController.text,
-                    maskedNumber: method.maskedNumber,
-                    isDefault: method.isDefault,
-                  );
-                });
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Payment method updated'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green[700],
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Update'),
-          ),
-        ],
       ),
+    );
+  }
+
+  Widget _buildDialogHeader({
+    required IconData icon,
+    required String title,
+    required Color color,
+  }) {
+    return Row(
+      children: [
+        Container(
+          height: 46,
+          width: 46,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
+    );
+  }
+
+  InputDecoration _fieldDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
     );
   }
 
@@ -366,55 +412,66 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
       }
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Default payment method updated'),
-        backgroundColor: Colors.green,
-      ),
+      const SnackBar(content: Text('Default payment method updated')),
     );
   }
 
   void _deletePaymentMethod(int index) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Payment Method'),
-        content: const Text('Are you sure you want to delete this payment method?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                final wasDefault = _paymentMethods[index].isDefault;
-                _paymentMethods.removeAt(index);
-                
-                // Set first item as default if deleted item was default
-                if (wasDefault && _paymentMethods.isNotEmpty) {
-                  _paymentMethods[0] = PaymentMethod(
-                    type: _paymentMethods[0].type,
-                    name: _paymentMethods[0].name,
-                    maskedNumber: _paymentMethods[0].maskedNumber,
-                    isDefault: true,
+      builder: (context) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildDialogHeader(
+                icon: Icons.delete_outline,
+                title: 'Delete Payment Method',
+                color: Colors.red.shade700,
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'Are you sure you want to delete this payment method?',
+                style: TextStyle(color: Colors.grey.shade700, height: 1.4),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    final wasDefault = _paymentMethods[index].isDefault;
+                    _paymentMethods.removeAt(index);
+
+                    if (wasDefault && _paymentMethods.isNotEmpty) {
+                      _paymentMethods[0] = PaymentMethod(
+                        type: _paymentMethods[0].type,
+                        name: _paymentMethods[0].name,
+                        maskedNumber: _paymentMethods[0].maskedNumber,
+                        isDefault: true,
+                      );
+                    }
+                  });
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Payment method deleted')),
                   );
-                }
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Payment method deleted'),
-                  backgroundColor: Colors.red,
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade700,
+                  foregroundColor: Colors.white,
                 ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Delete'),
+                child: const Text('Delete'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -422,20 +479,16 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
   String _maskNumber(String number) {
     if (number.length <= 4) return number;
     final lastFour = number.substring(number.length - 4);
-    return '•••• •••• •••• $lastFour';
+    return '**** **** **** $lastFour';
   }
 
   String _getPaymentTypeLabel(PaymentType type) {
-    switch (type) {
-      case PaymentType.creditCard:
-        return 'Credit Card';
-      case PaymentType.debitCard:
-        return 'Debit Card';
-      case PaymentType.bankAccount:
-        return 'Bank Account';
-      case PaymentType.digitalWallet:
-        return 'Digital Wallet';
-    }
+    return switch (type) {
+      PaymentType.creditCard => 'Credit Card',
+      PaymentType.debitCard => 'Debit Card',
+      PaymentType.bankAccount => 'Bank Account',
+      PaymentType.digitalWallet => 'Digital Wallet',
+    };
   }
 }
 
