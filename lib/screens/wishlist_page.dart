@@ -19,7 +19,7 @@ class _WishlistPageState extends State<WishlistPage> {
   final AuthService _authService = AuthService();
   final CartService _cartService = CartService();
   final WishlistService _wishlistService = WishlistService();
-  
+
   final List<String> _wishlistIds = [];
   bool _isLoading = true;
 
@@ -53,12 +53,12 @@ class _WishlistPageState extends State<WishlistPage> {
     if (userId != null) {
       try {
         await _wishlistService.removeFromWishlist(userId, productId);
-        if (!context.mounted) return;
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Removed from wishlist')),
         );
       } catch (e) {
-        if (!context.mounted) return;
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
         );
@@ -87,9 +87,10 @@ class _WishlistPageState extends State<WishlistPage> {
   @override
   Widget build(BuildContext context) {
     final userId = _authService.currentUser?.uid;
-    
+
     if (userId == null) {
       return Scaffold(
+        backgroundColor: Colors.grey.shade50,
         appBar: AppBar(title: const Text('Wishlist')),
         body: Center(
           child: Column(
@@ -110,11 +111,12 @@ class _WishlistPageState extends State<WishlistPage> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
         title: const Text('My Wishlist'),
         actions: [
           if (_wishlistIds.isNotEmpty)
-            TextButton(
+            IconButton(
               onPressed: () async {
                 final userId = _authService.currentUser?.uid;
                 if (userId != null) {
@@ -132,10 +134,8 @@ class _WishlistPageState extends State<WishlistPage> {
                   }
                 }
               },
-              child: const Text(
-                'Clear All',
-                style: TextStyle(color: Colors.white),
-              ),
+              tooltip: 'Clear wishlist',
+              icon: const Icon(Icons.delete_sweep_outlined),
             ),
         ],
       ),
@@ -149,37 +149,57 @@ class _WishlistPageState extends State<WishlistPage> {
 
   Widget _buildEmptyWishlist() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.favorite_border, size: 120, color: Colors.grey[400]),
-          const SizedBox(height: 24),
-          Text(
-            'Your wishlist is empty',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[700],
-            ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade200),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Add products you love to your wishlist',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.favorite_border,
+                  size: 70, color: Colors.blue.shade700),
+              const SizedBox(height: 18),
+              Text(
+                'Your wishlist is empty',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Add products you love to your wishlist',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              const SizedBox(height: 22),
+              ElevatedButton.icon(
+                onPressed: () => Navigator.pushNamed(context, '/shop'),
+                icon: const Icon(Icons.shopping_bag_outlined),
+                label: const Text('Start Shopping'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade700,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () => Navigator.pushNamed(context, '/shop'),
-            icon: const Icon(Icons.shopping_bag),
-            label: const Text('Start Shopping'),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -202,10 +222,10 @@ class _WishlistPageState extends State<WishlistPage> {
         }
 
         return GridView.builder(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            childAspectRatio: 0.75,
+            childAspectRatio: 0.72,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
           ),
@@ -219,20 +239,22 @@ class _WishlistPageState extends State<WishlistPage> {
   }
 
   Widget _buildWishlistCard(Product product) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProductDetailsPage(product: product),
-            ),
-          );
-        },
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsPage(product: product),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -240,12 +262,10 @@ class _WishlistPageState extends State<WishlistPage> {
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
+                    top: Radius.circular(8),
                   ),
                   child: Image.network(
-                    product.images.isNotEmpty
-                        ? product.images[0]
-                        : '',
+                    product.images.isNotEmpty ? product.images[0] : '',
                     width: double.infinity,
                     height: 120,
                     fit: BoxFit.cover,
@@ -282,7 +302,7 @@ class _WishlistPageState extends State<WishlistPage> {
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.5),
                         borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(12),
+                          top: Radius.circular(8),
                         ),
                       ),
                       child: const Center(
@@ -300,7 +320,7 @@ class _WishlistPageState extends State<WishlistPage> {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -317,7 +337,7 @@ class _WishlistPageState extends State<WishlistPage> {
                     Text(
                       'Rs. ${product.price.toStringAsFixed(2)}',
                       style: TextStyle(
-                        color: Theme.of(context).primaryColor,
+                        color: Colors.blue.shade700,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -332,6 +352,11 @@ class _WishlistPageState extends State<WishlistPage> {
                             : null,
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.zero,
+                          backgroundColor: Colors.blue.shade700,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                         child: const Text(
                           'Add to Cart',

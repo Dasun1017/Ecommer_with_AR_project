@@ -16,19 +16,21 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final AuthService _authService = AuthService();
-  
+
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
-  
+
   bool _isLoading = false;
   String? _photoUrl;
+  File? _selectedPhotoFile;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.user.name);
-    _phoneController = TextEditingController(text: widget.user.phoneNumber ?? '');
+    _phoneController =
+        TextEditingController(text: widget.user.phoneNumber ?? '');
     _addressController = TextEditingController(text: widget.user.address ?? '');
     _photoUrl = widget.user.photoUrl;
   }
@@ -45,17 +47,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (!mounted) return;
-    
+
     if (image != null) {
-      // In a real app, you'd upload to Firebase Storage and get the URL
-      // For now, we'll just use the local path
       setState(() {
-        _photoUrl = image.path;
+        _selectedPhotoFile = File(image.path);
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Image selected. In production, this would be uploaded to cloud storage.'),
+          content: Text('Photo selected. Tap Save Changes to update it.'),
         ),
       );
     }
@@ -71,15 +71,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
     });
 
     try {
+      var photoUrl = _photoUrl;
+      final selectedPhotoFile = _selectedPhotoFile;
+      if (selectedPhotoFile != null) {
+        photoUrl = await _authService.uploadUserProfileImage(
+          userId: widget.user.id,
+          imageFile: selectedPhotoFile,
+        );
+      }
+
       final updatedUser = widget.user.copyWith(
         name: _nameController.text.trim(),
-        phoneNumber: _phoneController.text.trim().isNotEmpty 
-            ? _phoneController.text.trim() 
+        phoneNumber: _phoneController.text.trim().isNotEmpty
+            ? _phoneController.text.trim()
             : null,
         address: _addressController.text.trim().isNotEmpty
             ? _addressController.text.trim()
             : null,
-        photoUrl: _photoUrl,
+        photoUrl: photoUrl,
         updatedAt: DateTime.now(),
       );
 
@@ -109,6 +118,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
         title: const Text('Edit Profile'),
         actions: [
@@ -135,22 +145,35 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
           child: Form(
             key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 20),
-                _buildProfilePhoto(),
-                const SizedBox(height: 30),
-                _buildNameField(),
+                _buildHeaderCard(),
                 const SizedBox(height: 16),
-                _buildEmailField(),
-                const SizedBox(height: 16),
-                _buildPhoneField(),
-                const SizedBox(height: 16),
-                _buildAddressField(),
-                const SizedBox(height: 30),
+                _buildSectionLabel('Personal Details'),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildNameField(),
+                      const SizedBox(height: 14),
+                      _buildEmailField(),
+                      const SizedBox(height: 14),
+                      _buildPhoneField(),
+                      const SizedBox(height: 14),
+                      _buildAddressField(),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 18),
                 _buildSaveButton(),
               ],
             ),
@@ -160,29 +183,102 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  Widget _buildHeaderCard() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue.shade700, Colors.blue.shade500],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withValues(alpha: 0.18),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          _buildProfilePhoto(),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Profile Details',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.user.email,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.82),
+                    fontSize: 13,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildProfilePhoto() {
+    ImageProvider? imageProvider;
+
+    final selectedPhotoFile = _selectedPhotoFile;
+    if (selectedPhotoFile != null) {
+      imageProvider = FileImage(selectedPhotoFile);
+    } else {
+      final photoUrl = _photoUrl;
+      if (photoUrl != null &&
+          photoUrl.trim().isNotEmpty &&
+          photoUrl.startsWith('http')) {
+        imageProvider = NetworkImage(photoUrl);
+      }
+    }
+
     return Stack(
+      clipBehavior: Clip.none,
       children: [
         CircleAvatar(
-          radius: 60,
-          backgroundImage: _photoUrl != null
-              ? (_photoUrl!.startsWith('http')
-                  ? NetworkImage(_photoUrl!)
-                  : FileImage(File(_photoUrl!))) as ImageProvider
-              : null,
-          child: _photoUrl == null
-              ? const Icon(Icons.person, size: 60)
+          radius: 36,
+          backgroundColor: Colors.white.withValues(alpha: 0.18),
+          backgroundImage: imageProvider,
+          child: imageProvider == null
+              ? const Icon(Icons.person, size: 38, color: Colors.white)
               : null,
         ),
         Positioned(
-          bottom: 0,
-          right: 0,
-          child: CircleAvatar(
-            backgroundColor: Theme.of(context).primaryColor,
-            radius: 20,
-            child: IconButton(
-              icon: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
-              onPressed: _pickImage,
+          bottom: -2,
+          right: -2,
+          child: InkWell(
+            onTap: _pickImage,
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              height: 30,
+              width: 30,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.camera_alt_outlined,
+                size: 17,
+                color: Colors.blue.shade700,
+              ),
             ),
           ),
         ),
@@ -190,13 +286,48 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  Widget _buildSectionLabel(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: Colors.grey.shade800,
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _fieldDecoration({
+    required String label,
+    required IconData icon,
+    String? hintText,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hintText,
+      prefixIcon: Icon(icon),
+      filled: true,
+      fillColor: Colors.grey.shade50,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+    );
+  }
+
   Widget _buildNameField() {
     return TextFormField(
       controller: _nameController,
-      decoration: const InputDecoration(
-        labelText: 'Full Name',
-        prefixIcon: Icon(Icons.person),
-        border: OutlineInputBorder(),
+      decoration: _fieldDecoration(
+        label: 'Full Name',
+        icon: Icons.person_outline,
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
@@ -210,10 +341,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget _buildEmailField() {
     return TextFormField(
       initialValue: widget.user.email,
-      decoration: const InputDecoration(
-        labelText: 'Email',
-        prefixIcon: Icon(Icons.email),
-        border: OutlineInputBorder(),
+      decoration: _fieldDecoration(
+        label: 'Email',
+        icon: Icons.email_outlined,
       ),
       enabled: false, // Email can't be changed
       style: TextStyle(color: Colors.grey[600]),
@@ -223,10 +353,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget _buildPhoneField() {
     return TextFormField(
       controller: _phoneController,
-      decoration: const InputDecoration(
-        labelText: 'Phone Number',
-        prefixIcon: Icon(Icons.phone),
-        border: OutlineInputBorder(),
+      decoration: _fieldDecoration(
+        label: 'Phone Number',
+        icon: Icons.phone_outlined,
         hintText: 'Optional',
       ),
       keyboardType: TextInputType.phone,
@@ -245,10 +374,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget _buildAddressField() {
     return TextFormField(
       controller: _addressController,
-      decoration: const InputDecoration(
-        labelText: 'Address',
-        prefixIcon: Icon(Icons.location_on),
-        border: OutlineInputBorder(),
+      decoration: _fieldDecoration(
+        label: 'Address',
+        icon: Icons.location_on_outlined,
         hintText: 'Optional',
       ),
       maxLines: 3,
@@ -262,8 +390,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       child: ElevatedButton(
         onPressed: _isLoading ? null : _saveProfile,
         style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue.shade700,
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
           ),
         ),
         child: _isLoading
